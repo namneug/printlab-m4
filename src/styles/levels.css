@@ -201,3 +201,33 @@
 .probe__choice.is-right { border-color: var(--green); color: var(--green); }
 .probe__choice.is-wrong { border-color: var(--red); color: var(--red); }
 .probe__fb { font-size: 13px; color: var(--tx-2); }
+
+/* ---------- ด่าน 4: วัสดุและความปลอดภัย ---------- */
+.l4 { display: grid; grid-template-columns: minmax(360px, 6fr) minmax(320px, 5fr); gap: var(--sp-4); align-items: start; }
+@media (max-width: 1000px) { .l4 { grid-template-columns: 1fr; } }
+.task-steps { display: flex; gap: var(--sp-2); }
+.task-step { flex: 1; padding: 6px 10px; border-radius: var(--radius); border: 1px solid var(--line-2); font-size: 12px; color: var(--tx-mut); font-family: var(--font-display); }
+.task-step.is-current { border-color: var(--amber); color: var(--amber); }
+.task-step.is-done { border-color: var(--green); color: var(--green); }
+.mat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-3); }
+.mat-card { display: flex; flex-direction: column; gap: 4px; padding: var(--sp-3); background: var(--panel-2); border: 1px solid var(--line); border-top: 3px solid var(--mat-color); border-radius: var(--radius); text-align: left; color: var(--tx); transition: border-color 0.15s, background 0.15s; }
+.mat-card:hover { background: var(--panel-3); border-color: var(--mat-color); }
+.mat-card.is-selected { border-color: var(--mat-color); box-shadow: 0 0 0 2px color-mix(in srgb, var(--mat-color) 40%, transparent); }
+.mat-card__name { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--mat-color); }
+.mat-card__full { font-size: 11px; color: var(--tx-dim); }
+.mat-card__sum { font-size: 13px; color: var(--tx-2); }
+.mat-table td.hl, .mat-table th.hl { background: color-mix(in srgb, var(--cyan) 10%, transparent); }
+.mat-table th { color: var(--tx); text-transform: none; font-size: 13px; }
+.mat-table th[data-mat] { color: var(--mat-color); }
+.rating { display: inline-flex; gap: 2px; }
+.rating i { width: 8px; height: 8px; border-radius: 2px; background: var(--line); }
+.rating i.on { background: var(--cyan); }
+.justify { display: flex; flex-direction: column; gap: 6px; }
+.settings { display: grid; gap: var(--sp-3); }
+.room-opts { display: flex; gap: var(--sp-2); }
+.room-opt { flex: 1; display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel-2); color: var(--tx-2); font-size: 14px; }
+.room-opt.is-selected { border-color: var(--cyan); color: var(--tx); background: color-mix(in srgb, var(--cyan) 10%, var(--panel-2)); }
+.temp-scale { position: relative; height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--cyan), var(--amber) 55%, var(--red)); margin: 4px 0; }
+.temp-scale__safe { position: absolute; top: -3px; height: 14px; border: 2px solid var(--green); border-radius: 4px; background: color-mix(in srgb, var(--green) 20%, transparent); }
+.temp-scale__max { position: absolute; top: -6px; width: 2px; height: 20px; background: var(--red); }
+.temp-scale__labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--tx-dim); font-family: var(--font-display); }

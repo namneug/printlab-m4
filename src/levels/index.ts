@@ -21,6 +21,8 @@ export async function loadLevel(id: string): Promise<LevelModule | null> {
       return (await import('./l2-params')).level;
     case 'l3':
       return (await import('./l3-diagnosis')).level;
+    case 'l4':
+      return (await import('./l4-materials')).level;
     default:
       return null;
   }

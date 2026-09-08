@@ -16,6 +16,10 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     sourcemap: false,
     rolldownOptions: {
+      input: {
+        main: new URL('./index.html', import.meta.url).pathname,
+        teacher: new URL('./teacher/index.html', import.meta.url).pathname,
+      },
       output: {
         codeSplitting: {
           groups: [{ name: 'three', test: /node_modules[\\/]three[\\/]/ }],

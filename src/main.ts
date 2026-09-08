@@ -5,8 +5,8 @@ import { route, setGuard, startRouter } from './ui/router';
 import { startScreen } from './ui/screens/start';
 import { mapScreen } from './ui/screens/map';
 import { levelScreen } from './ui/screens/level';
-import { placeholderScreen } from './ui/screens/placeholder';
 import { repairScreen } from './modes/repair';
+import { exploreScreen } from './modes/explore';
 import { dataScreen } from './ui/screens/data';
 import { startQueue } from './telemetry/queue';
 import { getSession, restoreSession } from './game/session';
@@ -20,7 +20,7 @@ route('/', startScreen);
 route('/map', mapScreen);
 route('/level/:id', levelScreen);
 route('/data', dataScreen);
-route('/explore', placeholderScreen('สำรวจสถาปัตยกรรม', 'eye'));
+route('/explore', exploreScreen);
 route('/repair', repairScreen);
 
 setGuard((path) => (path !== '/' && !getSession() ? '/' : null));

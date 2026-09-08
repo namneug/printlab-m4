@@ -174,3 +174,30 @@
 .diag-result { display: flex; flex-direction: column; gap: var(--sp-3); }
 .picker { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-3); background: var(--panel-3); border: 1px solid var(--line); border-radius: var(--radius); }
 .picker__title { font-size: 13px; color: var(--tx-2); font-family: var(--font-display); }
+
+/* ---------- โหมดสำรวจ ---------- */
+.screen--wide { grid-template-columns: 1fr; }
+.split--explore { grid-template-columns: minmax(400px, 6fr) minmax(360px, 5fr); }
+.split--explore > .viewport { height: calc(100vh - 140px); min-height: 420px; }
+@media (max-width: 1000px) { .split--explore { grid-template-columns: 1fr; } .split--explore > .viewport { height: 360px; } }
+.layer-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.layer-btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--panel-2); color: var(--tx-2); font-size: 14px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.layer-btn .icon { color: var(--layer-color); }
+.layer-btn:hover { border-color: var(--layer-color); }
+.layer-btn.is-on { border-color: var(--layer-color); background: color-mix(in srgb, var(--layer-color) 16%, var(--panel-2)); color: var(--tx); }
+.part-list { display: flex; flex-direction: column; gap: var(--sp-3); }
+.part-list__title { display: flex; align-items: center; gap: 6px; font-family: var(--font-display); font-weight: 600; font-size: 13px; color: var(--tx-2); margin-bottom: 6px; }
+.part-list__items { display: flex; flex-wrap: wrap; gap: 6px; }
+.part-list .part-chip { min-height: 34px; padding: 0 10px; font-size: 13px; cursor: pointer; }
+.probe { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-3); background: var(--panel-2); border: 1px solid var(--line-2); border-left: 3px solid var(--violet); border-radius: var(--radius); }
+.probe__q { display: flex; gap: 8px; align-items: flex-start; font-family: var(--font-display); font-weight: 600; font-size: 14px; }
+.probe__q .icon { color: var(--violet); flex: 0 0 auto; margin-top: 2px; }
+.probe__choices { display: flex; flex-direction: column; gap: 6px; }
+.probe__choice { justify-content: flex-start; white-space: normal; text-align: left; min-height: 40px; font-weight: 500; }
+.probe__choice.is-right { border-color: var(--green); color: var(--green); }
+.probe__choice.is-wrong { border-color: var(--red); color: var(--red); }
+.probe__fb { font-size: 13px; color: var(--tx-2); }

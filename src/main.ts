@@ -6,6 +6,7 @@ import { startScreen } from './ui/screens/start';
 import { mapScreen } from './ui/screens/map';
 import { levelScreen } from './ui/screens/level';
 import { placeholderScreen } from './ui/screens/placeholder';
+import { repairScreen } from './modes/repair';
 import { dataScreen } from './ui/screens/data';
 import { startQueue } from './telemetry/queue';
 import { getSession, restoreSession } from './game/session';
@@ -20,7 +21,7 @@ route('/map', mapScreen);
 route('/level/:id', levelScreen);
 route('/data', dataScreen);
 route('/explore', placeholderScreen('สำรวจสถาปัตยกรรม', 'eye'));
-route('/repair', placeholderScreen('โมดูลซ่อม', 'wrench'));
+route('/repair', repairScreen);
 
 setGuard((path) => (path !== '/' && !getSession() ? '/' : null));
 

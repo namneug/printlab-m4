@@ -134,3 +134,43 @@
 .trials tr.is-pass td { background: color-mix(in srgb, var(--green) 8%, transparent); }
 .xsec { display: block; width: 100%; height: auto; background: var(--bg-deep); border: 1px solid var(--line-2); border-radius: var(--radius); }
 .constraints { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+
+/* ---------- ด่าน 3 / โมดูลซ่อม: วินิจฉัย ---------- */
+.diag { display: grid; grid-template-columns: minmax(300px, 4fr) minmax(380px, 6fr); gap: var(--sp-4); align-items: start; }
+@media (max-width: 1000px) { .diag { grid-template-columns: 1fr; } }
+.illus { background: var(--bg-deep); border: 1px solid var(--line-2); border-radius: var(--radius); padding: var(--sp-2); color: var(--tx-2); }
+.illus svg { display: block; width: 100%; height: auto; max-height: 200px; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px var(--sp-3); font-size: 13px; }
+.kv dt { color: var(--tx-mut); }
+.kv dd { margin: 0; color: var(--tx); font-family: var(--font-display); }
+.budget { display: flex; flex-direction: column; gap: 4px; }
+.budget__bar { height: 10px; background: var(--panel-3); border-radius: 999px; overflow: hidden; }
+.budget__fill { height: 100%; background: var(--cyan); transition: width 0.3s; }
+.budget__fill.is-warn { background: var(--amber); }
+.budget__fill.is-over { background: var(--red); }
+.budget__label { display: flex; justify-content: space-between; font-size: 13px; color: var(--tx-mut); }
+.hypo { display: flex; flex-direction: column; gap: var(--sp-2); }
+.hypo__item { display: flex; align-items: flex-start; gap: var(--sp-3); padding: var(--sp-2) var(--sp-3); background: var(--panel-2); border: 1px solid var(--line-2); border-radius: var(--radius); font-size: 14px; }
+.hypo__item.is-eliminated { opacity: 0.5; text-decoration: line-through; border-color: var(--line); }
+.hypo__item.is-eliminated .btn { display: none; }
+.hypo__item.is-chosen { border-color: var(--amber); }
+.hypo__mark { width: 22px; height: 22px; flex: 0 0 auto; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; font-family: var(--font-display); font-size: 12px; color: var(--tx-mut); }
+.hypo__text { flex: 1; }
+.hypo__note { display: block; font-size: 12px; color: var(--tx-mut); }
+.tests { display: flex; flex-direction: column; gap: var(--sp-2); }
+.test { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-3); background: var(--panel-2); border: 1px solid var(--line-2); border-radius: var(--radius); text-align: left; font-size: 14px; color: var(--tx); }
+.test:hover { border-color: var(--cyan); }
+.test.is-done { border-color: color-mix(in srgb, var(--green) 40%, var(--line)); color: var(--tx-mut); }
+.test.is-unaffordable { opacity: 0.5; }
+.test__cost { margin-left: auto; font-family: var(--font-display); color: var(--amber); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+.test__cost .icon { width: 14px; height: 14px; }
+.evidence { display: flex; flex-direction: column; gap: var(--sp-2); }
+.evidence:empty::before { content: 'ยังไม่มีหลักฐาน เลือกการทดสอบเพื่อเก็บหลักฐาน'; color: var(--tx-dim); font-size: 13px; }
+.evi { padding: var(--sp-2) var(--sp-3); background: var(--panel-2); border: 1px solid var(--line-2); border-left: 3px solid var(--cyan); border-radius: var(--radius); font-size: 14px; }
+.evi__from { display: block; font-size: 12px; color: var(--tx-mut); }
+.evi label { display: flex; gap: var(--sp-2); align-items: flex-start; cursor: pointer; }
+.evi input { margin-top: 4px; accent-color: var(--cyan); }
+.diag-form { display: flex; flex-direction: column; gap: var(--sp-3); }
+.diag-result { display: flex; flex-direction: column; gap: var(--sp-3); }
+.picker { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-3); background: var(--panel-3); border: 1px solid var(--line); border-radius: var(--radius); }
+.picker__title { font-size: 13px; color: var(--tx-2); font-family: var(--font-display); }

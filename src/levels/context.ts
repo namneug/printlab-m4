@@ -29,7 +29,7 @@ export interface MentorHost {
   /** trigger ปัจจุบันสำหรับกรณีผู้เล่นกดขอคำใบ้เอง */
   setTrigger(trigger: string | null, vars?: Record<string, string | number>): void;
   /** ระบบเสนอคำใบ้เองตามเงื่อนไขสถานะเกม */
-  offer(trigger: string, vars?: Record<string, string | number>): Promise<void>;
+  offer(trigger: string, vars?: Record<string, string | number>): Promise<boolean>;
   /** อธิบายข้อผิดพลาด (feed back) */
   explain(trigger: string, vars?: Record<string, string | number>): Promise<void>;
   /** ข้อความคงที่ด้านความปลอดภัย (ห้ามดัดแปลง) */

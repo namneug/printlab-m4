@@ -298,3 +298,9 @@ select.input { appearance: auto; }
   0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--cyan) 50%, transparent); }
   50% { box-shadow: 0 0 0 6px transparent; }
 }
+
+/* จอสัมผัส/แท็บเล็ต: พื้นที่กดไม่ต่ำกว่า 44 px */
+@media (max-width: 900px), (pointer: coarse) {
+  .btn--sm, .test, .part-chip, .stmt-chip, .layer-btn, .mat-pill, .room-opt, .dnode { min-height: 44px; }
+  .part-list .part-chip, .bin__items .part-chip { min-height: 40px; }
+}

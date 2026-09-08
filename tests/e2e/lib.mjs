@@ -47,7 +47,7 @@ export async function getEvents(page) {
       if (!db.objectStoreNames.contains('events')) { resolve([]); return; }
       const tx = db.transaction('events', 'readonly');
       const all = tx.objectStore('events').getAll();
-      all.onsuccess = () => resolve(all.result);
+      all.onsuccess = () => resolve(all.result.sort((a, b) => a.clientTs.localeCompare(b.clientTs)));
       all.onerror = () => resolve([]);
     };
     req.onerror = () => resolve([]);

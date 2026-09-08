@@ -21,3 +21,6 @@ pnpm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# e2e screenshots
+tests/e2e/shots/

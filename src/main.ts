@@ -1,22 +1,23 @@
 import './styles/base.css';
-import { createLabScene } from './game/scene';
-import { loadPrinterModel } from './game/loader';
-import { createHud } from './ui/hud';
+import './styles/shell.css';
+import { route, setGuard, startRouter } from './ui/router';
+import { startScreen } from './ui/screens/start';
+import { mapScreen } from './ui/screens/map';
+import { levelScreen } from './ui/screens/level';
+import { placeholderScreen } from './ui/screens/placeholder';
+import { getSession, restoreSession } from './game/session';
 
 const app = document.getElementById('app');
 if (!app) {
   throw new Error('ไม่พบ #app ใน index.html');
 }
 
-const lab = createLabScene(app, {
-  gridSize: 2,
-  target: [0, 0.22, 0],
-  cameraPos: [0.75, 0.55, 0.85],
-  autoRotate: true,
-});
+route('/', startScreen);
+route('/map', mapScreen);
+route('/level/:id', levelScreen);
+route('/explore', placeholderScreen('สำรวจสถาปัตยกรรม', 'eye'));
+route('/repair', placeholderScreen('โมดูลซ่อม', 'wrench'));
 
-loadPrinterModel().then((printer) => {
-  lab.scene.add(printer.root);
-});
+setGuard((path) => (path !== '/' && !getSession() ? '/' : null));
 
-createHud(document.body);
+restoreSession().finally(() => startRouter(app));

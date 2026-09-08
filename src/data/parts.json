@@ -1,0 +1,295 @@
+{
+  "$comment": "ชิ้นส่วน 18 ชิ้นของ Creality Ender 3 V3 KE (โมเดล primitive) — แก้ชื่อ หน้าที่ คำถาม และการเชื่อมต่อได้ที่นี่โดยไม่ต้องแก้โค้ด หน่วยขนาดเป็นเมตร มุมเป็นองศา",
+  "subsystems": [
+    { "id": "structure", "name": "โครงสร้าง", "description": "รับน้ำหนักและรักษาตำแหน่งสัมพัทธ์ของทุกระบบ", "color": "#8e9aa8" },
+    { "id": "motion", "name": "การเคลื่อนที่", "description": "ย้ายหัวฉีดและฐานพิมพ์ไปยังตำแหน่งที่บอร์ดสั่งอย่างแม่นยำ", "color": "#4fd6d2" },
+    { "id": "extrusion_thermal", "name": "การอัดรีดและความร้อน", "description": "หลอมเส้นพลาสติกและดันออกทางหัวฉีดในอัตราที่ควบคุมได้", "color": "#f2a13f" },
+    { "id": "control", "name": "ควบคุมและจ่ายไฟ", "description": "รับคำสั่ง ประมวลผล และสั่งงานทุกระบบพร้อมจ่ายพลังงาน", "color": "#8f7ae0" },
+    { "id": "build_plate", "name": "ฐานพิมพ์", "description": "ให้พื้นผิวที่ร้อนพอดีและเรียบเพื่อให้ชั้นแรกยึดติด", "color": "#6cc08d" }
+  ],
+  "parts": [
+    {
+      "id": "frame_base",
+      "name": "ฐานโครงอะลูมิเนียม",
+      "short": "ฐานโครง",
+      "subsystem": "structure",
+      "function": "เป็นฐานรองรับน้ำหนักทั้งเครื่อง ยึดรางแกน Y มอเตอร์ Y บอร์ดควบคุม และแหล่งจ่ายไฟไว้ด้านล่าง",
+      "connects": ["z_gantry", "y_motor", "mainboard", "power_supply", "heated_bed"],
+      "color": "#3a4350",
+      "geometry": [
+        { "type": "box", "size": [0.04, 0.04, 0.46], "pos": [-0.17, 0.02, 0] },
+        { "type": "box", "size": [0.04, 0.04, 0.46], "pos": [0.17, 0.02, 0] },
+        { "type": "box", "size": [0.38, 0.04, 0.04], "pos": [0, 0.02, -0.21] },
+        { "type": "box", "size": [0.38, 0.04, 0.04], "pos": [0, 0.02, 0.21] },
+        { "type": "box", "size": [0.04, 0.035, 0.42], "pos": [0, 0.0175, 0], "color": "#2a323d" }
+      ]
+    },
+    {
+      "id": "z_gantry",
+      "name": "เสาแกน Z (โครงตั้ง)",
+      "short": "เสาแกน Z",
+      "subsystem": "structure",
+      "function": "เสาคู่ที่ตั้งฉากกับฐาน เป็นรางให้คานแกน X เลื่อนขึ้นลงตามความสูงของชั้นพิมพ์",
+      "connects": ["frame_base", "x_gantry_beam", "z_leadscrew", "z_motor"],
+      "color": "#3a4350",
+      "geometry": [
+        { "type": "box", "size": [0.04, 0.46, 0.04], "pos": [-0.21, 0.27, -0.06] },
+        { "type": "box", "size": [0.04, 0.46, 0.04], "pos": [0.21, 0.27, -0.06] },
+        { "type": "box", "size": [0.46, 0.04, 0.04], "pos": [0, 0.52, -0.06] }
+      ]
+    },
+    {
+      "id": "x_gantry_beam",
+      "name": "คานแกน X",
+      "short": "คานแกน X",
+      "subsystem": "structure",
+      "function": "คานแนวนอนที่แบกชุดหัวฉีด เลื่อนซ้ายขวาไม่ได้เอง แต่พาหัวฉีดขึ้นลงตามแกน Z",
+      "connects": ["z_gantry", "x_motor", "belts", "extruder", "z_leadscrew"],
+      "color": "#48525f",
+      "geometry": [
+        { "type": "box", "size": [0.42, 0.04, 0.04], "pos": [0, 0.27, -0.03] },
+        { "type": "box", "size": [0.05, 0.06, 0.03], "pos": [-0.19, 0.27, -0.06], "color": "#2a323d" },
+        { "type": "box", "size": [0.05, 0.06, 0.03], "pos": [0.19, 0.27, -0.06], "color": "#2a323d" }
+      ]
+    },
+    {
+      "id": "x_motor",
+      "name": "มอเตอร์แกน X",
+      "short": "มอเตอร์ X",
+      "subsystem": "motion",
+      "function": "สเต็ปเปอร์มอเตอร์ที่หมุนสายพานเพื่อพาหัวฉีดเลื่อนซ้าย–ขวาตามคำสั่งจากบอร์ด",
+      "connects": ["mainboard", "belts", "x_gantry_beam"],
+      "color": "#1f2530",
+      "geometry": [
+        { "type": "box", "size": [0.042, 0.042, 0.042], "pos": [-0.225, 0.27, 0.0] },
+        { "type": "cylinder", "size": [0.008, 0.008, 0.012], "pos": [-0.225, 0.27, 0.027], "rot": [90, 0, 0], "color": "#8e9aa8" }
+      ]
+    },
+    {
+      "id": "y_motor",
+      "name": "มอเตอร์แกน Y",
+      "short": "มอเตอร์ Y",
+      "subsystem": "motion",
+      "function": "สเต็ปเปอร์มอเตอร์ที่ขับสายพานเพื่อพาฐานพิมพ์เลื่อนหน้า–หลัง",
+      "connects": ["mainboard", "belts", "frame_base", "heated_bed"],
+      "color": "#1f2530",
+      "geometry": [
+        { "type": "box", "size": [0.042, 0.042, 0.042], "pos": [0, 0.045, -0.25] }
+      ]
+    },
+    {
+      "id": "z_motor",
+      "name": "มอเตอร์แกน Z",
+      "short": "มอเตอร์ Z",
+      "subsystem": "motion",
+      "function": "หมุนเพลาเกลียวเพื่อยกคานแกน X ขึ้นทีละชั้นตามความสูงของชั้นพิมพ์",
+      "connects": ["mainboard", "z_leadscrew", "z_gantry"],
+      "color": "#1f2530",
+      "geometry": [
+        { "type": "box", "size": [0.042, 0.042, 0.042], "pos": [-0.21, 0.065, -0.11] }
+      ]
+    },
+    {
+      "id": "belts",
+      "name": "สายพานและพูลเลย์",
+      "short": "สายพาน",
+      "subsystem": "motion",
+      "function": "ถ่ายทอดการหมุนของมอเตอร์เป็นการเลื่อนเชิงเส้นของหัวฉีด (แกน X) และฐานพิมพ์ (แกน Y)",
+      "connects": ["x_motor", "y_motor", "extruder", "heated_bed"],
+      "color": "#111417",
+      "geometry": [
+        { "type": "box", "size": [0.40, 0.006, 0.012], "pos": [0, 0.29, -0.005] },
+        { "type": "box", "size": [0.012, 0.006, 0.42], "pos": [0.03, 0.045, 0] }
+      ]
+    },
+    {
+      "id": "z_leadscrew",
+      "name": "เพลาเกลียวแกน Z",
+      "short": "เพลาเกลียว Z",
+      "subsystem": "motion",
+      "function": "แท่งเกลียวที่เปลี่ยนการหมุนของมอเตอร์ Z เป็นการเลื่อนขึ้นลงที่ละเอียดมาก",
+      "connects": ["z_motor", "x_gantry_beam", "z_gantry"],
+      "color": "#c7d0da",
+      "geometry": [
+        { "type": "cylinder", "size": [0.005, 0.005, 0.42], "pos": [-0.21, 0.30, -0.11] }
+      ]
+    },
+    {
+      "id": "extruder",
+      "name": "ชุดขับเส้น (Direct Drive)",
+      "short": "ชุดขับเส้น",
+      "subsystem": "extrusion_thermal",
+      "function": "มอเตอร์กับเฟืองที่จับเส้นพลาสติกแล้วดันลงสู่หัวร้อนในอัตราที่บอร์ดกำหนด",
+      "connects": ["mainboard", "hotend_heater", "x_gantry_beam", "belts"],
+      "color": "#586474",
+      "geometry": [
+        { "type": "box", "size": [0.055, 0.07, 0.05], "pos": [0.04, 0.275, 0.015] },
+        { "type": "cylinder", "size": [0.012, 0.012, 0.02], "pos": [0.04, 0.32, 0.015], "color": "#c7d0da" }
+      ]
+    },
+    {
+      "id": "hotend_heater",
+      "name": "ฮีตเตอร์หัวร้อน",
+      "short": "ฮีตเตอร์",
+      "subsystem": "extrusion_thermal",
+      "function": "แท่งความร้อนในบล็อกโลหะ รับไฟจากบอร์ดเพื่อหลอมเส้นพลาสติกให้ไหลได้",
+      "connects": ["mainboard", "nozzle", "thermistor", "extruder"],
+      "color": "#f2a13f",
+      "geometry": [
+        { "type": "box", "size": [0.03, 0.02, 0.025], "pos": [0.04, 0.228, 0.015] }
+      ]
+    },
+    {
+      "id": "nozzle",
+      "name": "หัวฉีด",
+      "short": "หัวฉีด",
+      "subsystem": "extrusion_thermal",
+      "function": "ปลายทองเหลืองรูเล็ก (0.4 มม.) ที่พลาสติกหลอมเหลวไหลออกมาเป็นเส้น",
+      "connects": ["hotend_heater", "pei_plate"],
+      "color": "#d9a441",
+      "geometry": [
+        { "type": "cone", "size": [0.008, 0.014], "pos": [0.04, 0.211, 0.015], "rot": [180, 0, 0] }
+      ]
+    },
+    {
+      "id": "thermistor",
+      "name": "เทอร์มิสเตอร์",
+      "short": "เทอร์มิสเตอร์",
+      "subsystem": "extrusion_thermal",
+      "function": "เซนเซอร์วัดอุณหภูมิที่บล็อกความร้อน ส่งค่ากลับให้บอร์ดเพื่อปรับไฟที่จ่ายให้ฮีตเตอร์",
+      "connects": ["hotend_heater", "mainboard"],
+      "color": "#4fd6d2",
+      "probe": {
+        "question": "ถ้าถอดเทอร์มิสเตอร์ออก ระบบใดจะทำงานผิดพลาดก่อน",
+        "choices": ["การเคลื่อนที่ของแกน X", "การควบคุมอุณหภูมิหัวร้อน", "การยึดติดของฐานพิมพ์", "หน้าจอสัมผัส"],
+        "answer": 1,
+        "explain": "บอร์ดไม่ได้รับค่าอุณหภูมิย้อนกลับ จึงไม่รู้ว่าจะจ่ายไฟให้ฮีตเตอร์เท่าไร เครื่องรุ่นใหม่จะหยุดทำความร้อนทันทีเพื่อความปลอดภัย"
+      },
+      "geometry": [
+        { "type": "cylinder", "size": [0.004, 0.004, 0.018], "pos": [0.06, 0.228, 0.015], "rot": [0, 0, 90] }
+      ]
+    },
+    {
+      "id": "part_cooling_fan",
+      "name": "พัดลมเป่าชิ้นงาน",
+      "short": "พัดลมชิ้นงาน",
+      "subsystem": "extrusion_thermal",
+      "function": "เป่าลมให้พลาสติกที่เพิ่งออกจากหัวฉีดแข็งตัวเร็ว ช่วยให้ส่วนยื่นและรายละเอียดเล็กคมชัด",
+      "connects": ["mainboard", "nozzle"],
+      "color": "#3f4a58",
+      "probe": {
+        "question": "ถ้าพัดลมเป่าชิ้นงานหยุดหมุน ลักษณะชิ้นงานจะเปลี่ยนอย่างไร",
+        "choices": ["ชั้นแรกไม่ติดฐาน", "ส่วนยื่นและมุมเล็กหย่อนย้อย", "หัวฉีดตัน", "ชิ้นงานหดตัวมากขึ้น"],
+        "answer": 1,
+        "explain": "พลาสติกที่ไม่ถูกเป่าให้เย็นจะยังอ่อนตัวเมื่อชั้นถัดไปทับ ทำให้รูปทรงส่วนยื่นเสียไป"
+      },
+      "geometry": [
+        { "type": "box", "size": [0.04, 0.035, 0.012], "pos": [0.04, 0.245, 0.048] },
+        { "type": "cylinder", "size": [0.014, 0.014, 0.014], "pos": [0.04, 0.245, 0.048], "rot": [90, 0, 0], "color": "#1f2530" }
+      ]
+    },
+    {
+      "id": "mainboard",
+      "name": "บอร์ดควบคุม",
+      "short": "บอร์ดควบคุม",
+      "subsystem": "control",
+      "function": "อ่าน G-code แล้วสั่งมอเตอร์ ฮีตเตอร์ และพัดลม พร้อมเปรียบเทียบค่าจากเซนเซอร์เพื่อควบคุมอุณหภูมิ",
+      "connects": ["power_supply", "touchscreen", "x_motor", "y_motor", "z_motor", "extruder", "hotend_heater", "thermistor", "part_cooling_fan", "heated_bed"],
+      "color": "#8f7ae0",
+      "probe": {
+        "question": "บอร์ดควบคุมรู้ได้อย่างไรว่าหัวร้อนถึงอุณหภูมิที่ตั้งไว้แล้ว",
+        "choices": ["จับเวลาที่จ่ายไฟ", "อ่านค่าจากเทอร์มิสเตอร์", "ผู้ใช้กดยืนยันบนหน้าจอ", "วัดกระแสที่ฮีตเตอร์ใช้"],
+        "answer": 1,
+        "explain": "นี่คือวงจรป้อนกลับ: เทอร์มิสเตอร์วัด → บอร์ดเปรียบเทียบกับค่าเป้าหมาย → ปรับไฟให้ฮีตเตอร์"
+      },
+      "geometry": [
+        { "type": "box", "size": [0.12, 0.02, 0.15], "pos": [0.14, -0.015, 0.05] }
+      ]
+    },
+    {
+      "id": "touchscreen",
+      "name": "หน้าจอสัมผัส",
+      "short": "หน้าจอ",
+      "subsystem": "control",
+      "function": "ส่วนติดต่อผู้ใช้สำหรับเลือกไฟล์ ตั้งอุณหภูมิ ปรับระดับฐาน และดูสถานะการพิมพ์",
+      "connects": ["mainboard"],
+      "color": "#212832",
+      "geometry": [
+        { "type": "box", "size": [0.11, 0.075, 0.012], "pos": [0.29, 0.09, 0.16], "rot": [-25, 0, 0] },
+        { "type": "box", "size": [0.095, 0.06, 0.002], "pos": [0.29, 0.092, 0.167], "rot": [-25, 0, 0], "color": "#4fd6d2" },
+        { "type": "box", "size": [0.03, 0.06, 0.03], "pos": [0.29, 0.03, 0.16], "color": "#2a323d" }
+      ]
+    },
+    {
+      "id": "power_supply",
+      "name": "แหล่งจ่ายไฟ",
+      "short": "แหล่งจ่ายไฟ",
+      "subsystem": "control",
+      "function": "แปลงไฟบ้าน 220 V เป็นไฟกระแสตรง 24 V ให้บอร์ด มอเตอร์ ฮีตเตอร์ และฐานพิมพ์",
+      "connects": ["mainboard", "heated_bed", "frame_base"],
+      "color": "#2f3743",
+      "geometry": [
+        { "type": "box", "size": [0.10, 0.05, 0.2], "pos": [-0.12, -0.03, 0.04] }
+      ]
+    },
+    {
+      "id": "heated_bed",
+      "name": "ฐานพิมพ์ทำความร้อน",
+      "short": "ฐานร้อน",
+      "subsystem": "build_plate",
+      "function": "แผ่นอะลูมิเนียมที่มีฮีตเตอร์และเซนเซอร์อุณหภูมิในตัว ทำให้ชั้นแรกยึดติดและลดการหดตัว",
+      "connects": ["pei_plate", "belts", "y_motor", "mainboard", "power_supply"],
+      "color": "#3a4350",
+      "geometry": [
+        { "type": "box", "size": [0.25, 0.01, 0.25], "pos": [0, 0.075, 0.02] },
+        { "type": "box", "size": [0.22, 0.02, 0.22], "pos": [0, 0.06, 0.02], "color": "#2a323d" }
+      ]
+    },
+    {
+      "id": "pei_plate",
+      "name": "แผ่นรองพิมพ์ PEI แม่เหล็ก",
+      "short": "แผ่น PEI",
+      "subsystem": "build_plate",
+      "function": "แผ่นสปริงเหล็กเคลือบ PEI ยึดด้วยแม่เหล็ก ให้ผิวที่พลาสติกติดตอนร้อนและหลุดง่ายเมื่อเย็นและงอแผ่น",
+      "connects": ["heated_bed", "nozzle"],
+      "color": "#6cc08d",
+      "probe": {
+        "question": "ทำไมแผ่น PEI จึงต้องเป็นแม่เหล็กและงอได้",
+        "choices": ["เพื่อระบายความร้อนเร็วขึ้น", "เพื่อถอดออกมางอให้ชิ้นงานหลุดโดยไม่ต้องแซะ", "เพื่อให้เคลื่อนที่ตามแกน Y ได้", "เพื่อวัดระดับฐานอัตโนมัติ"],
+        "answer": 1,
+        "explain": "การแซะชิ้นงานบนฐานแข็งทำให้ผิวฐานเสียหาย แผ่นสปริงที่งอได้แก้ปัญหานี้และถอดเปลี่ยนได้เร็ว"
+      },
+      "geometry": [
+        { "type": "box", "size": [0.235, 0.004, 0.235], "pos": [0, 0.082, 0.02] }
+      ]
+    }
+  ],
+  "feedback_loop": ["thermistor", "mainboard", "hotend_heater"],
+  "flows": {
+    "control": {
+      "name": "สัญญาณควบคุม",
+      "color": "#8f7ae0",
+      "edges": [
+        ["touchscreen", "mainboard"], ["thermistor", "mainboard"], ["power_supply", "mainboard"],
+        ["mainboard", "x_motor"], ["mainboard", "y_motor"], ["mainboard", "z_motor"],
+        ["mainboard", "extruder"], ["mainboard", "hotend_heater"], ["mainboard", "part_cooling_fan"], ["mainboard", "heated_bed"]
+      ]
+    },
+    "heat": {
+      "name": "การถ่ายเทความร้อน",
+      "color": "#f2a13f",
+      "edges": [
+        ["hotend_heater", "nozzle"], ["hotend_heater", "thermistor"], ["heated_bed", "pei_plate"],
+        ["power_supply", "hotend_heater"], ["power_supply", "heated_bed"], ["part_cooling_fan", "nozzle"]
+      ]
+    },
+    "motion": {
+      "name": "แรงและการเคลื่อนที่",
+      "color": "#4fd6d2",
+      "edges": [
+        ["x_motor", "belts"], ["belts", "extruder"], ["y_motor", "belts"], ["belts", "heated_bed"],
+        ["z_motor", "z_leadscrew"], ["z_leadscrew", "x_gantry_beam"], ["x_gantry_beam", "extruder"], ["z_gantry", "x_gantry_beam"], ["frame_base", "z_gantry"]
+      ]
+    }
+  }
+}

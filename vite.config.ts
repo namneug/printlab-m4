@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  base: '/printlab-m4/',
   resolve: {
     alias: {
       '@': new URL('./src', import.meta.url).pathname,

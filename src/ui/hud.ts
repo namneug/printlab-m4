@@ -24,7 +24,7 @@ export function createHud(root: HTMLElement): HTMLElement {
   status.className = 'chip chip--muted';
   status.appendChild(icon('grid'));
   const statusText = document.createElement('span');
-  statusText.textContent = 'M0 · ฉากว่าง';
+  statusText.textContent = 'M1 · โมเดลเครื่องพิมพ์';
   status.appendChild(statusText);
 
   top.append(brand, status);

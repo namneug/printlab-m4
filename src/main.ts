@@ -5,6 +5,8 @@ import { startScreen } from './ui/screens/start';
 import { mapScreen } from './ui/screens/map';
 import { levelScreen } from './ui/screens/level';
 import { placeholderScreen } from './ui/screens/placeholder';
+import { dataScreen } from './ui/screens/data';
+import { startQueue } from './telemetry/queue';
 import { getSession, restoreSession } from './game/session';
 
 const app = document.getElementById('app');
@@ -15,9 +17,13 @@ if (!app) {
 route('/', startScreen);
 route('/map', mapScreen);
 route('/level/:id', levelScreen);
+route('/data', dataScreen);
 route('/explore', placeholderScreen('สำรวจสถาปัตยกรรม', 'eye'));
 route('/repair', placeholderScreen('โมดูลซ่อม', 'wrench'));
 
 setGuard((path) => (path !== '/' && !getSession() ? '/' : null));
 
-restoreSession().finally(() => startRouter(app));
+restoreSession().finally(() => {
+  startQueue();
+  startRouter(app);
+});

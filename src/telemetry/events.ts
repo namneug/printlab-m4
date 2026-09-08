@@ -1,6 +1,9 @@
-/** จุดบันทึก event กลาง — M2 เขียนลง console ก่อน M3 จะต่อคิว IndexedDB */
+/** จุดบันทึก event กลาง — ทุกการกระทำในเกมผ่านฟังก์ชันนี้ */
 import type { Construct, GameEvent } from './schema';
 import { getSession, newId } from '../game/session';
+import { enqueue } from './queue';
+
+const DEBUG = import.meta.env.DEV || (import.meta.env['VITE_DEBUG_EVENTS'] as string | undefined) === '1';
 
 export function track(
   eventType: string,
@@ -20,6 +23,7 @@ export function track(
     payload,
     clientTs: new Date().toISOString(),
   };
-  console.debug('[event]', ev.eventType, ev.levelId, ev.payload);
+  if (DEBUG) console.debug('[event]', ev.eventType, ev.levelId ?? '-', ev.construct ?? '-', ev.payload);
+  void enqueue(ev);
   return ev;
 }

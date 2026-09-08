@@ -1,7 +1,16 @@
 import levelsData from '../data/levels.json';
 import type { LevelMeta, LevelModule } from './context';
+// import แบบ static ทั้งหมด เพื่อให้เล่นได้ครบทุกด่านแม้ออฟไลน์หลังโหลดหน้าแรกครั้งเดียว (ห้ามใช้ dynamic import ที่นี่)
+import { level as l1 } from './l1-system';
+import { level as l2 } from './l2-params';
+import { level as l3 } from './l3-diagnosis';
+import { level as l4 } from './l4-materials';
+import { level as l5 } from './l5-design';
+import { level as l6 } from './l6-impact';
 
 export const LEVELS: LevelMeta[] = (levelsData as { levels: LevelMeta[] }).levels;
+
+const MODULES: Record<string, LevelModule> = { l1, l2, l3, l4, l5, l6 };
 
 export function levelMeta(id: string): LevelMeta | undefined {
   return LEVELS.find((l) => l.id === id);
@@ -12,22 +21,7 @@ export function nextLevel(id: string): LevelMeta | undefined {
   return i >= 0 ? LEVELS[i + 1] : undefined;
 }
 
-/** โหลดโมดูลของด่านแบบแยกไฟล์ (code-splitting) — ด่านที่ยังไม่มีคืน null */
+/** คืนโมดูลของด่าน (null ถ้าไม่มี) — คง async ไว้เพื่อให้กรอบด่านไม่ต้องเปลี่ยนเมื่อมีด่านเพิ่มภายหลัง */
 export async function loadLevel(id: string): Promise<LevelModule | null> {
-  switch (id) {
-    case 'l1':
-      return (await import('./l1-system')).level;
-    case 'l2':
-      return (await import('./l2-params')).level;
-    case 'l3':
-      return (await import('./l3-diagnosis')).level;
-    case 'l4':
-      return (await import('./l4-materials')).level;
-    case 'l5':
-      return (await import('./l5-design')).level;
-    case 'l6':
-      return (await import('./l6-impact')).level;
-    default:
-      return null;
-  }
+  return MODULES[id] ?? null;
 }

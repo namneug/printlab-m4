@@ -3,7 +3,7 @@ import { icon } from '../icons';
 import type { Screen } from '../router';
 import { getSession } from '../../game/session';
 import { allEvents, endpointConfigured, onQueueChange, pendingCount, flush } from '../../telemetry/queue';
-import { download, filterEvents, levelStats, stripStored, toCSV, toJSON, stamp, mean } from '../../telemetry/export';
+import { download, filterEvents, levelStats, stripStored, toCSV, toJSON, toSummaryCSV, stamp, mean } from '../../telemetry/export';
 import { CONSTRUCT_LABELS, type Construct } from '../../telemetry/schema';
 import { LEVELS } from '../../levels';
 import { track } from '../../telemetry/events';
@@ -25,6 +25,7 @@ export const dataScreen: Screen = (root) => {
   const csSel = el('select', { class: 'input' }, el('option', { value: '', text: 'ทุก construct' }), ...(Object.keys(CONSTRUCT_LABELS) as Construct[]).map((c) => el('option', { value: c, text: CONSTRUCT_LABELS[c] }))) as HTMLSelectElement;
   const btnCsv = el('button', { class: 'btn', type: 'button' }, icon('download'), 'ส่งออก CSV');
   const btnJson = el('button', { class: 'btn', type: 'button' }, icon('download'), 'ส่งออก JSON');
+  const btnSummary = el('button', { class: 'btn', type: 'button' }, icon('download'), 'สรุปรายคน CSV');
   const btnFlush = el('button', { class: 'btn btn--ghost', type: 'button', hidden: !endpointConfigured() }, icon('upload'), 'ส่งข้อมูลค้างส่ง');
 
   const main = el('main', { class: 'map-main' },
@@ -34,7 +35,7 @@ export const dataScreen: Screen = (root) => {
     ),
     el('section', { class: 'map-section' },
       el('div', { class: 'section-head' }, el('h2', { class: 'section-title', text: 'ส่งออกข้อมูล' }), el('p', { class: 'section-sub', text: 'แยกตามช่วงเวลาและ construct ได้ ไฟล์มีเฉพาะรหัสนิรนาม' })),
-      el('div', { class: 'row' }, tpSel, csSel, btnCsv, btnJson, btnFlush),
+      el('div', { class: 'row' }, tpSel, csSel, btnCsv, btnJson, btnSummary, btnFlush),
     ),
     el('section', { class: 'map-section' },
       el('div', { class: 'section-head' }, el('h2', { class: 'section-title', text: 'สรุปรายด่าน' })),
@@ -101,6 +102,11 @@ export const dataScreen: Screen = (root) => {
     const rows = filterEvents(stripStored(await allEvents()), filterNow());
     track('export', { format: 'json', count: rows.length, ...filterNow() });
     download(`printlab-events-${stamp()}.json`, toJSON(rows), 'application/json');
+  });
+  btnSummary.addEventListener('click', async () => {
+    const rows = filterEvents(stripStored(await allEvents()), filterNow());
+    track('export', { format: 'summary_csv', count: rows.length, ...filterNow() });
+    download(`printlab-summary-${stamp()}.csv`, toSummaryCSV(rows), 'text/csv;charset=utf-8');
   });
   btnFlush.addEventListener('click', async () => {
     const n = await flush();

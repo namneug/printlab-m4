@@ -153,3 +153,28 @@ export function participantSummaries(rows: GameEvent[]): ParticipantSummary[] {
 export function mean(xs: number[]): number | null {
   return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
 }
+
+/** สรุปรายคน 1 แถว = 1 นักเรียน (เปิดใน Excel ได้ทันที) */
+export function toSummaryCSV(rows: GameEvent[], roster?: string[]): string {
+  const summaries = participantSummaries(rows);
+  const map = new Map(summaries.map((s) => [s.participantCode, s]));
+  const codes = roster && roster.length ? roster : summaries.map((s) => s.participantCode);
+  const header = ['participantCode', 'timepoints', 'sessions', 'events', 'levelsCompleted', 'levelsCount', 'hints', 'totalDurationMin', 'safetyViolations', 'lastSeen'];
+  const lines = [header.join(',')];
+  for (const code of codes) {
+    const s = map.get(code);
+    lines.push([
+      code,
+      s ? s.timepoints.join('|') : '',
+      s ? s.sessions : 0,
+      s ? s.events : 0,
+      s ? s.levelsCompleted.join('|') : '',
+      s ? s.levelsCompleted.length : 0,
+      s ? s.hints : 0,
+      s ? Math.round(s.totalDurationMs / 60000) : 0,
+      s ? s.safetyViolations : 0,
+      s ? s.lastSeen : '',
+    ].map(csvCell).join(','));
+  }
+  return '﻿' + lines.join('\r\n');
+}

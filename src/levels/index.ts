@@ -23,6 +23,10 @@ export async function loadLevel(id: string): Promise<LevelModule | null> {
       return (await import('./l3-diagnosis')).level;
     case 'l4':
       return (await import('./l4-materials')).level;
+    case 'l5':
+      return (await import('./l5-design')).level;
+    case 'l6':
+      return (await import('./l6-impact')).level;
     default:
       return null;
   }

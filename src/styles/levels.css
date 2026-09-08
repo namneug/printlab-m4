@@ -231,3 +231,72 @@
 .temp-scale__safe { position: absolute; top: -3px; height: 14px; border: 2px solid var(--green); border-radius: 4px; background: color-mix(in srgb, var(--green) 20%, transparent); }
 .temp-scale__max { position: absolute; top: -6px; width: 2px; height: 20px; background: var(--red); }
 .temp-scale__labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--tx-dim); font-family: var(--font-display); }
+
+/* ---------- ด่าน 5: EDP ---------- */
+.edp-steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--sp-2); margin-bottom: var(--sp-4); }
+.edp-step { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--panel); text-align: left; color: var(--tx-mut); font-size: 13px; }
+.edp-step__num { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+.edp-step__name { font-family: var(--font-display); font-weight: 600; color: var(--tx-2); }
+.edp-step.is-current { border-color: var(--amber); }
+.edp-step.is-current .edp-step__num { color: var(--amber); }
+.edp-step.is-done { border-color: color-mix(in srgb, var(--green) 50%, var(--line)); }
+.edp-step.is-done .edp-step__num { color: var(--green); }
+.edp-step.is-locked { opacity: 0.6; }
+.edp-step:hover { background: var(--panel-2); }
+@media (max-width: 900px) { .edp-steps { grid-template-columns: repeat(2, 1fr); } }
+.round-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--violet) 18%, var(--panel-2)); color: var(--violet); font-family: var(--font-display); font-weight: 600; font-size: 13px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--sp-3); }
+.dcard { display: flex; flex-direction: column; gap: 6px; padding: var(--sp-3); background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius); text-align: left; color: var(--tx); min-height: 96px; }
+.dcard:hover { border-color: var(--cyan); }
+.dcard.is-open { border-color: color-mix(in srgb, var(--cyan) 50%, var(--line)); }
+.dcard__title { font-family: var(--font-display); font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+.dcard__title .icon { color: var(--cyan); }
+.dcard__body { font-size: 13px; color: var(--tx-2); }
+.dcard__body[hidden] { display: none; }
+.sketches { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); }
+@media (max-width: 900px) { .sketches { grid-template-columns: 1fr; } }
+.sketch { display: flex; flex-direction: column; gap: 6px; padding: var(--sp-3); background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius); text-align: left; color: var(--tx); }
+.sketch:hover { border-color: var(--amber); }
+.sketch.is-selected { border-color: var(--amber); box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber) 40%, transparent); }
+.sketch svg { width: 100%; height: auto; background: var(--bg-deep); border-radius: 6px; color: var(--tx-2); }
+.sketch__name { font-family: var(--font-display); font-weight: 600; font-size: 14px; }
+.sketch__desc { font-size: 12px; color: var(--tx-mut); }
+.test-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--sp-3); }
+.test-card { display: flex; flex-direction: column; gap: 4px; padding: var(--sp-3); border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--panel-2); }
+.test-card__name { font-size: 12px; color: var(--tx-mut); }
+.test-card__val { font-family: var(--font-display); font-size: 18px; font-weight: 600; }
+.test-card__verdict { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+.test-card__verdict .icon { width: 14px; height: 14px; }
+.test-card.is-pass { border-color: color-mix(in srgb, var(--green) 50%, var(--line)); }
+.test-card.is-pass .test-card__verdict { color: var(--green); }
+.test-card.is-fail { border-color: color-mix(in srgb, var(--red) 50%, var(--line)); }
+.test-card.is-fail .test-card__verdict { color: var(--red); }
+.mat-pills { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.mat-pill { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel-2); color: var(--tx-2); font-family: var(--font-display); font-weight: 600; }
+.mat-pill.is-selected { border-color: var(--mat-color); color: var(--mat-color); background: color-mix(in srgb, var(--mat-color) 14%, var(--panel-2)); }
+.stmt { display: flex; gap: var(--sp-2); align-items: flex-start; padding: 8px 12px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--panel-2); font-size: 14px; }
+.stmt.is-own { border-left: 3px solid var(--cyan); }
+.stmt input { margin-top: 4px; accent-color: var(--cyan); }
+.rubric { display: grid; gap: var(--sp-2); }
+.rubric__row { display: grid; grid-template-columns: 1fr auto; gap: var(--sp-3); align-items: center; padding: 8px 12px; background: var(--panel-2); border: 1px solid var(--line-2); border-radius: var(--radius); font-size: 14px; }
+.rubric__lvl { display: inline-flex; gap: 3px; }
+.rubric__lvl i { width: 10px; height: 10px; border-radius: 2px; background: var(--line); }
+.rubric__lvl i.on { background: var(--amber); }
+
+/* ---------- ด่าน 6: ผลกระทบ ---------- */
+.numbers { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--sp-3); }
+.numbers .stat { min-width: 0; }
+.stat__src { font-size: 11px; color: var(--tx-dim); }
+.impact-bins { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-3); }
+@media (max-width: 900px) { .impact-bins { grid-template-columns: 1fr; } }
+.impact-bin { min-height: 120px; }
+.stmt-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel-3); font-size: 13px; text-align: left; color: var(--tx); cursor: pointer; max-width: 100%; }
+.stmt-chip.is-selected { border-color: var(--amber); box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber) 40%, transparent); }
+.stmt-chip.is-placed { cursor: default; border-color: color-mix(in srgb, var(--green) 50%, var(--line)); }
+.stmt-chip .sign { font-family: var(--font-display); font-weight: 700; }
+.stmt-chip .sign--plus { color: var(--green); }
+.stmt-chip .sign--minus { color: var(--red); }
+.options { display: flex; flex-direction: column; gap: var(--sp-2); }
+.option { display: flex; align-items: center; gap: var(--sp-3); padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel-2); color: var(--tx); text-align: left; }
+.option.is-selected { border-color: var(--amber); }
+.argument { display: flex; flex-direction: column; gap: var(--sp-2); }

@@ -1,0 +1,48 @@
+/* PRINTLAB — design tokens
+   ตัวแปรสีหลักของทั้งเกม ห้ามใช้ค่าสีตรง ๆ ในไฟล์อื่น ให้อ้างผ่านตัวแปรเหล่านี้เสมอ */
+:root {
+  /* พื้นหลัง */
+  --bg: #12161c;
+  --bg-deep: #0f1319;
+
+  /* พาเนล */
+  --panel: #161b22;
+  --panel-2: #1a2029;
+  --panel-3: #212832;
+
+  /* เส้นขอบ */
+  --line: #2a323d;
+  --line-2: #262e38;
+
+  /* ตัวอักษร */
+  --tx: #e9edf2;
+  --tx-2: #c7d0da;
+  --tx-mut: #8e9aa8;
+  --tx-dim: #6f7c8a;
+
+  /* สีเน้น */
+  --amber: #f2a13f;
+  --cyan: #4fd6d2;
+  --violet: #8f7ae0;
+  --green: #6cc08d;
+  --red: #e4664f;
+
+  /* ฟอนต์ */
+  --font-display: 'Bai Jamjuree', 'Noto Sans Thai', system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans Thai', 'Noto Sans Thai', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ระยะ / มุมโค้ง */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --radius: 8px;
+  --radius-lg: 12px;
+
+  /* ไอคอน (inline SVG แบบเส้น) */
+  --icon-size: 18px;
+  --icon-stroke: 1.75;
+}

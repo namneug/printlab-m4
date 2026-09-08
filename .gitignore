@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+
+# build output — ห้าม commit ไฟล์ build ลง repo
+dist/
+dist-ssr/
+*.local
+
+# vercel
+.vercel/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# editor / os
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db

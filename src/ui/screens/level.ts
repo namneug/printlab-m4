@@ -68,10 +68,12 @@ export const levelScreen: Screen = (root, params) => {
 
   /* ---------- พี่เลี้ยง ---------- */
   const mentorLog = el('div', { class: 'mentor__log', role: 'log', 'aria-live': 'polite' });
+  const mentorToggle = el('button', { class: 'mentor__toggle', type: 'button', 'aria-label': 'พับ/ขยายพี่เลี้ยง' }, icon('list'));
   const mentorDock = el('aside', { class: 'mentor', 'aria-label': 'พี่เลี้ยง' },
-    el('div', { class: 'mentor__head' }, icon('compass'), el('span', { text: 'พี่เลี้ยง' }), el('span', { class: 'mentor__src', text: 'แบบมีกฎ' })),
+    el('div', { class: 'mentor__head' }, icon('compass'), el('span', { text: 'พี่เลี้ยง' }), el('span', { class: 'mentor__src', text: 'แบบมีกฎ' }), mentorToggle),
     mentorLog,
   );
+  mentorToggle.addEventListener('click', () => mentorDock.classList.toggle('is-collapsed'));
 
   const pushMessage = (m: MentorMessage): void => {
     const item = el('div', { class: `mentor__msg mentor__msg--${m.mode}${m.safety ? ' mentor__msg--safety' : ''}` },
@@ -79,7 +81,8 @@ export const levelScreen: Screen = (root, params) => {
       el('p', { text: m.text }),
     );
     mentorLog.appendChild(item);
-    while (mentorLog.children.length > 6) mentorLog.firstElementChild?.remove();
+    mentorDock.classList.remove('is-collapsed');
+    while (mentorLog.children.length > 8) mentorLog.firstElementChild?.remove();
     mentorLog.scrollTop = mentorLog.scrollHeight;
     item.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'ease-out' });
   };

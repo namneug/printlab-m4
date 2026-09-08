@@ -15,6 +15,8 @@ export function nextLevel(id: string): LevelMeta | undefined {
 /** โหลดโมดูลของด่านแบบแยกไฟล์ (code-splitting) — ด่านที่ยังไม่มีคืน null */
 export async function loadLevel(id: string): Promise<LevelModule | null> {
   switch (id) {
+    case 'l1':
+      return (await import('./l1-system')).level;
     default:
       return null;
   }

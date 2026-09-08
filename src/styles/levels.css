@@ -1,0 +1,95 @@
+/* สไตล์เฉพาะด่าน */
+
+/* ---------- เลย์เอาต์สองคอลัมน์ ---------- */
+.split { display: grid; grid-template-columns: minmax(360px, 5fr) minmax(420px, 6fr); gap: var(--sp-4); align-items: start; }
+.split > .viewport { position: sticky; top: 80px; height: calc(100vh - 300px); min-height: 380px; }
+@media (max-width: 1000px) {
+  .split { grid-template-columns: 1fr; }
+  .split > .viewport { position: relative; top: auto; height: 320px; }
+}
+
+.phase-head { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-3); }
+.phase-head__num { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--amber); color: #1a1206; font-family: var(--font-display); font-weight: 700; }
+.phase-head h2 { font-size: 18px; }
+.phase-head p { font-size: 13px; color: var(--tx-mut); }
+
+/* ---------- ด่าน 1: จัดกลุ่ม ---------- */
+.l1-tray { display: flex; flex-wrap: wrap; gap: var(--sp-2); min-height: 56px; padding: var(--sp-3); background: var(--panel-2); border: 1px dashed var(--line); border-radius: var(--radius); }
+.l1-tray:empty::after { content: 'จัดครบทุกชิ้นแล้ว'; color: var(--green); font-size: 14px; }
+.part-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 12px;
+  background: var(--panel-3);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--tx);
+  font-size: 14px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.part-chip:hover, .part-chip.is-hover { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 12%, var(--panel-3)); }
+.part-chip.is-selected { border-color: var(--amber); box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber) 40%, transparent); }
+.part-chip.is-dragging { opacity: 0.35; }
+.part-chip.is-placed { cursor: default; border-color: color-mix(in srgb, var(--green) 50%, var(--line)); }
+.part-chip.is-placed .icon { color: var(--green); }
+.part-chip__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--sub-color, var(--tx-dim)); flex: 0 0 auto; }
+.drag-ghost { position: fixed; z-index: 100; pointer-events: none; opacity: 0.9; transform: translate(-50%, -50%) scale(1.04); }
+
+.bins { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: var(--sp-3); margin-top: var(--sp-4); }
+.bin {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  min-height: 140px;
+  padding: var(--sp-3);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--sub-color, var(--line));
+  border-radius: var(--radius);
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+.bin:hover, .bin.is-over { background: var(--panel-2); border-color: var(--sub-color, var(--cyan)); }
+.bin.is-wrong { animation: shake 0.3s ease; border-color: var(--red); }
+.bin.is-right { border-color: var(--green); }
+.bin__title { font-family: var(--font-display); font-weight: 600; font-size: 15px; display: flex; align-items: center; justify-content: space-between; }
+.bin__count { font-size: 12px; color: var(--tx-mut); font-weight: 500; }
+.bin__desc { font-size: 12px; color: var(--tx-mut); }
+.bin__items { display: flex; flex-wrap: wrap; gap: 6px; }
+.bin__items .part-chip { min-height: 32px; padding: 0 10px; font-size: 13px; }
+
+.part-info { margin-top: var(--sp-3); padding: var(--sp-3) var(--sp-4); background: var(--panel-2); border: 1px solid var(--line-2); border-left: 3px solid var(--cyan); border-radius: var(--radius); min-height: 96px; font-size: 14px; }
+.part-info strong { font-family: var(--font-display); color: var(--cyan); display: block; }
+.part-info.is-empty { color: var(--tx-dim); border-left-color: var(--line); }
+
+/* ---------- ด่าน 1: ผังระบบ (SVG) ---------- */
+.diagram { width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; }
+.diagram > svg { display: block; width: 100%; height: auto; font-family: var(--font-body); user-select: none; touch-action: none; }
+.dnode { cursor: pointer; }
+.dnode rect { fill: var(--panel-3); stroke: var(--line); stroke-width: 1.5; rx: 10; transition: stroke 0.15s, fill 0.15s; }
+.dnode:hover rect, .dnode.is-hover rect { stroke: var(--cyan); fill: var(--panel-2); }
+.dnode.is-source rect { stroke: var(--amber); stroke-width: 2.5; }
+.dnode text { fill: var(--tx); font-size: 18px; font-family: var(--font-display); font-weight: 600; pointer-events: none; }
+.dnode .dnode__sub { fill: var(--tx-mut); font-size: 12.5px; font-family: var(--font-body); font-weight: 400; }
+.dnode--input rect { stroke: var(--amber); }
+.dnode--process rect { stroke: var(--violet); }
+.dnode--output rect { stroke: var(--green); }
+.dnode--feedback rect { stroke: var(--cyan); }
+.dlink { stroke: var(--cyan); stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+.dlink--feedback { stroke: var(--cyan); stroke-dasharray: 6 4; }
+.dlink--wrong { stroke: var(--red); marker-end: url(#arrow-red); }
+.dlink--draft { stroke: var(--amber); stroke-dasharray: 4 4; marker-end: url(#arrow-amber); pointer-events: none; }
+.dlink-hit { stroke: transparent; stroke-width: 16; fill: none; cursor: pointer; }
+.dlink-hit:hover + .dlink { stroke: var(--red); }
+.diagram__toolbar { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; padding: var(--sp-3); border-top: 1px solid var(--line-2); font-size: 13px; color: var(--tx-mut); }
+.diagram__toolbar .spacer { flex: 1; }
+.checklist { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.checklist__item { display: flex; align-items: center; gap: var(--sp-2); color: var(--tx-mut); }
+.checklist__item .icon { width: 16px; height: 16px; color: var(--tx-dim); }
+.checklist__item.is-done { color: var(--green); }
+.checklist__item.is-done .icon { color: var(--green); }

@@ -1,5 +1,6 @@
 import './styles/base.css';
 import './styles/shell.css';
+import './styles/levels.css';
 import { route, setGuard, startRouter } from './ui/router';
 import { startScreen } from './ui/screens/start';
 import { mapScreen } from './ui/screens/map';

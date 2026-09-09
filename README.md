@@ -117,6 +117,18 @@ npm run test:e2e     # e2e ทั้งหมด (ต้องเปิด previ
 2. Settings → Secrets and variables → Actions: เพิ่ม secret `TEACHER_PASSWORD` (และ variable `ROSTER_SIZE` ถ้าไม่ใช่ 50)
 3. push ขึ้น `main` → เปิด `https://<owner>.github.io/printlab-m4/` และแดชบอร์ดที่ `…/printlab-m4/teacher/`
 
+**ทางสำรองถ้า GitHub Actions รันไม่ได้** (เช่น บัญชีติด spending limit) มี branch `gh-pages` ที่เก็บเฉพาะไฟล์ build จาก `main` ให้ตั้ง Settings → Pages → Source = **Deploy from a branch** เลือก `gh-pages` / root แล้วเปิด URL เดิม อัปเดตด้วยคำสั่ง
+
+```bash
+npm run build
+git worktree add --orphan -b gh-pages /tmp/ghp   # ครั้งแรก (ครั้งต่อไปใช้ git worktree add /tmp/ghp gh-pages)
+cp -r dist/. /tmp/ghp/ && touch /tmp/ghp/.nojekyll
+git -C /tmp/ghp add -A && git -C /tmp/ghp commit -m "gh-pages: build" && git -C /tmp/ghp push -f origin gh-pages
+git worktree remove --force /tmp/ghp
+```
+
+branch `gh-pages` มีแต่ผลลัพธ์ build (ไม่ใช่ branch หลัก) source ทั้งหมดอยู่ที่ `main`
+
 บน Pages ไม่มี serverless functions: event จะเก็บในเบราว์เซอร์ของนักเรียนและส่งออกเป็นไฟล์ให้ครูนำเข้าแดชบอร์ด ถ้าต้องการรวมข้อมูลอัตโนมัติให้ deploy API บน Vercel แล้วตั้ง `EVENTS_ENDPOINT` / `TEACHER_API` เป็น repository variables
 
 ### Vercel (เกม + API + Supabase)

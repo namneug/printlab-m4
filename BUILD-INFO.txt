@@ -1,2 +1,2 @@
-ไฟล์ build ของ PRINTLAB สำหรับ GitHub Pages แบบ Deploy from a branch (สำรองกรณี Actions ใช้ไม่ได้)
-สร้างจาก main @ c791986 ด้วย npm run build — ห้ามแก้ตรงนี้ source อยู่ที่ branch main
+ไฟล์ build ของ PRINTLAB สำหรับ GitHub Pages แบบ Deploy from a branch
+สร้างจาก main @ 7850282 ด้วย npm run build — ห้ามแก้ตรงนี้ source อยู่ที่ branch main

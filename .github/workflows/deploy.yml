@@ -1,0 +1,49 @@
+# Deploy PRINTLAB ขึ้น GitHub Pages ที่ https://<owner>.github.io/printlab-m4/
+# ตั้งค่า: Settings → Pages → Source = GitHub Actions · Secrets: TEACHER_PASSWORD (รหัสแดชบอร์ดครู)
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+        env:
+          VITE_TEACHER_PASSWORD: ${{ secrets.TEACHER_PASSWORD }}
+          VITE_ROSTER_SIZE: ${{ vars.ROSTER_SIZE || '50' }}
+          # GitHub Pages ไม่มี serverless functions: ปล่อยว่างให้เก็บข้อมูลในเครื่องและส่งออกเป็นไฟล์
+          VITE_EVENTS_ENDPOINT: ${{ vars.EVENTS_ENDPOINT || '' }}
+          VITE_TEACHER_API: ${{ vars.TEACHER_API || '' }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

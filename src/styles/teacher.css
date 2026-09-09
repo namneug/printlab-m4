@@ -1,0 +1,21 @@
+/* แดชบอร์ดครู */
+.teacher-main { width: min(1280px, 100%); margin: 0 auto; padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-5); }
+.gate { min-height: 100vh; display: grid; place-items: center; padding: var(--sp-5); }
+.gate .card { width: min(460px, 100%); display: flex; flex-direction: column; gap: var(--sp-4); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--sp-3); }
+.kpis .stat { min-width: 0; }
+.tp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--sp-3); }
+.tp-card { display: flex; flex-direction: column; gap: 6px; padding: var(--sp-3); background: var(--panel-2); border: 1px solid var(--line-2); border-radius: var(--radius); }
+.tp-card__name { font-family: var(--font-display); font-weight: 700; color: var(--cyan); }
+.tp-card__row { display: flex; justify-content: space-between; font-size: 13px; }
+.tp-card__row b { font-family: var(--font-display); }
+.tp-card__missing { font-size: 11px; color: var(--tx-dim); word-break: break-all; }
+.pending { color: var(--tx-dim); font-style: italic; }
+.dot-ok { color: var(--green); }
+.dot-no { color: var(--tx-dim); }
+.src-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; }
+.file-btn { position: relative; overflow: hidden; }
+.file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.banner { padding: var(--sp-3) var(--sp-4); border: 1px solid var(--line); border-radius: var(--radius); font-size: 13px; color: var(--tx-2); background: var(--panel); display: flex; gap: var(--sp-2); align-items: center; }
+.banner .icon { color: var(--amber); }
+.mini-table th, .mini-table td { padding: 4px 8px; font-size: 13px; }

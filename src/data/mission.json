@@ -1,0 +1,58 @@
+{
+  "$comment": "โจทย์ด่าน 5 ภารกิจออกแบบเต็มวงจร — แก้บริบท เงื่อนไข การ์ดข้อมูล แบบร่าง และเกณฑ์ได้ที่นี่ · sketch factors คูณกับแบบจำลองด่าน 2 (l2-params.model.ts) · เกณฑ์ทดสอบเป็นดุลยพินิจของผู้ออกแบบ ต้องผ่าน IOC",
+  "title": "ที่แขวนสายชาร์จข้างโต๊ะเรียน",
+  "scenario": "ในห้องเรียนคอมพิวเตอร์ 1117 สายชาร์จโน้ตบุ๊กและโทรศัพท์ของนักเรียนวางระเกะระกะบนพื้น มีคนสะดุดบ่อย ครูขอให้ชมรมออกแบบ 'ที่แขวนสายชาร์จ' ที่เกี่ยวกับขอบโต๊ะเรียนได้โดยไม่ต้องเจาะโต๊ะ พิมพ์ด้วยเครื่องพิมพ์ 3 มิติของโรงเรียนภายในคาบเรียนเดียว",
+  "requirements": [
+    { "id": "load", "text": "รับน้ำหนักสายชาร์จ 2 เส้นรวม 0.3 กก. ได้โดยไม่หัก (เผื่อความปลอดภัย 3 เท่า = 0.9 กก.)", "relevant": true },
+    { "id": "fit", "text": "เกี่ยวกับขอบโต๊ะที่หนา 25 มม. ได้พอดี", "relevant": true },
+    { "id": "no_tools", "text": "ติดตั้งได้โดยไม่ต้องเจาะหรือใช้เครื่องมือ", "relevant": true },
+    { "id": "bump", "text": "ทนการกระแทกจากเข่าและกระเป๋าทุกวันโดยไม่แตก", "relevant": true },
+    { "id": "time", "text": "พิมพ์เสร็จภายในคาบเรียน (≤ 90 นาที) และใช้เส้นไม่เกิน 20 กรัม", "relevant": true },
+    { "id": "waterproof", "text": "กันน้ำได้เมื่อจุ่มน้ำ", "relevant": false },
+    { "id": "transparent", "text": "ต้องโปร่งใสมองทะลุได้", "relevant": false },
+    { "id": "featherlight", "text": "หนักไม่เกิน 3 กรัม", "relevant": false }
+  ],
+  "min_requirements": 3,
+  "data_cards": [
+    { "id": "table_edge", "title": "วัดขอบโต๊ะเรียน", "body": "ขอบโต๊ะในห้อง 1117 หนา 25 มม. ผิวเรียบ ลึกจากขอบถึงขาโต๊ะ 40 มม.", "key": "25" },
+    { "id": "cable_weight", "title": "ชั่งน้ำหนักสายชาร์จ", "body": "สายชาร์จโน้ตบุ๊กพร้อมอะแดปเตอร์ 180 กรัม สายโทรศัพท์ 60 กรัม รวม 2 เส้นประมาณ 240–300 กรัม" },
+    { "id": "material_table", "title": "ตารางสมบัติวัสดุ (จากด่าน 4)", "body": "PLA พิมพ์ง่าย ถูก แต่เปราะ · PETG เหนียว ทนกระแทก · ABS ทนร้อน ต้องระบายอากาศ · TPU ยืดหยุ่น รับน้ำหนักได้น้อย" },
+    { "id": "printer_limits", "title": "ข้อจำกัดของเครื่องและคาบเรียน", "body": "Ender 3 V3 KE ฐาน 220×220 มม. คาบเรียน 90 นาที ห้องมีระบบดูดอากาศเฉพาะที่ตู้ครอบ" },
+    { "id": "existing", "title": "สำรวจของที่มีขายและงานเดิม", "body": "ที่แขวนแบบตะขอบางที่พิมพ์ด้วย PLA หักภายใน 1 สัปดาห์ แบบหนีบขอบโต๊ะที่มีฐานรองสองด้านใช้ได้นาน" }
+  ],
+  "min_cards": 3,
+  "measurement_question": { "text": "ขอบโต๊ะที่ต้องเกี่ยวหนากี่มิลลิเมตร", "answer": 25, "unit": "มม." },
+  "sketches": [
+    { "id": "hook_clip", "name": "แบบ A: ตะขอบางหนีบขอบ", "desc": "ตะขอชิ้นเดียวบาง ๆ ใช้แรงหนีบของพลาสติกยึดขอบโต๊ะ เบา พิมพ์เร็ว", "volume_factor": 0.5, "strength_factor": 0.45, "needs_tools": false, "fits_25mm": true },
+    { "id": "clamp_holder", "name": "แบบ B: ตัวหนีบมีฐานรองสองด้าน", "desc": "ครอบขอบโต๊ะทั้งบนและล่าง มีตะขอสองอันแยกสายโน้ตบุ๊กกับโทรศัพท์", "volume_factor": 1.0, "strength_factor": 1.0, "needs_tools": false, "fits_25mm": true },
+    { "id": "block_bracket", "name": "แบบ C: ฉากยึดทึบขันสกรู", "desc": "ฉากทึบหนา แข็งแรงมาก ยึดด้วยสกรู 2 ตัวเข้าโต๊ะ", "volume_factor": 1.8, "strength_factor": 1.6, "needs_tools": true, "fits_25mm": true }
+  ],
+  "materials": [
+    { "id": "PLA", "strength_factor": 1.0, "toughness": 2, "temp_range": [190, 220], "max_safe_temp": 240 },
+    { "id": "PETG", "strength_factor": 1.1, "toughness": 4, "temp_range": [230, 250], "max_safe_temp": 265 },
+    { "id": "ABS", "strength_factor": 1.05, "toughness": 4, "temp_range": [230, 260], "max_safe_temp": 275 },
+    { "id": "TPU", "strength_factor": 0.35, "toughness": 5, "temp_range": [210, 230], "max_safe_temp": 245 }
+  ],
+  "tests": {
+    "load_min_kg": 0.9,
+    "bump_min_toughness": 3,
+    "time_max_min": 90,
+    "material_max_g": 20
+  },
+  "design_reasons": [
+    { "id": "strong_enough", "text": "รับน้ำหนักได้พอโดยไม่ต้องใช้วัสดุมากเกิน", "good_for": ["clamp_holder"] },
+    { "id": "no_tools", "text": "ติดตั้งโดยไม่ต้องเจาะโต๊ะ", "good_for": ["hook_clip", "clamp_holder"] },
+    { "id": "fast_cheap", "text": "พิมพ์เร็วและใช้เส้นน้อยที่สุด", "good_for": ["hook_clip"] },
+    { "id": "strongest", "text": "แข็งแรงที่สุดในสามแบบ", "good_for": ["block_bracket"] },
+    { "id": "looks", "text": "รูปทรงสวยที่สุด", "good_for": [] }
+  ],
+  "change_reasons": [
+    { "id": "load", "text": "การทดสอบรับน้ำหนักไม่ผ่าน", "test": "load" },
+    { "id": "bump", "text": "การทดสอบกระแทกไม่ผ่าน (วัสดุเปราะ)", "test": "bump" },
+    { "id": "time", "text": "เวลาพิมพ์เกินคาบเรียน", "test": "time" },
+    { "id": "material", "text": "ใช้เส้นเกินงบ", "test": "material" },
+    { "id": "temp", "text": "อุณหภูมิไม่อยู่ในช่วงของวัสดุ", "test": "temp" },
+    { "id": "tools", "text": "ติดตั้งต้องใช้เครื่องมือ ขัดกับเงื่อนไข", "test": "install" },
+    { "id": "whim", "text": "อยากลองเปลี่ยนดูเฉย ๆ", "test": null }
+  ]
+}

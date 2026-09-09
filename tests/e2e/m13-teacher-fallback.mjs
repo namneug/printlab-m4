@@ -1,5 +1,5 @@
 /** แดชบอร์ดครูเมื่อ build โดยไม่ตั้ง VITE_TEACHER_PASSWORD: ต้องเข้าได้ด้วยรหัสสำรองและมีคำเตือน */
-import { launch, assert, report, BASE } from './lib.mjs';
+import { dismissTour, launch, assert, report, BASE } from './lib.mjs';
 const { page, errors, close } = await launch();
 try {
   await page.goto(BASE + 'teacher/', { waitUntil: 'networkidle' });

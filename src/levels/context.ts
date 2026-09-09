@@ -1,6 +1,8 @@
 import type { Construct } from '../telemetry/schema';
 import type { Session } from '../game/session';
 import type { MentorMode } from '../mentor';
+import type { Guide } from '../ui/guide';
+import type { TourStep } from '../ui/tour';
 
 export interface LevelConcept {
   term: string;
@@ -50,6 +52,10 @@ export interface LevelContext {
   complete(evidence: Record<string, unknown>, vars?: Record<string, string | number>): void;
   /** ข้อความสถานะสั้น ๆ ใต้ชื่อด่าน */
   setStatus(text: string): void;
+  /** แถบนำทาง: ขั้น / ประโยคสั่งทำ / ความคืบหน้า / ปุ่มหลัก (สอนเฉพาะวิธีใช้หน้าจอ) */
+  guide: Guide;
+  /** กำหนดทัวร์แนะนำหน้าจอของด่าน (กรอบด่านจะเปิดให้อัตโนมัติครั้งแรก และเปิดซ้ำได้จากปุ่ม ?) */
+  defineTour(steps: TourStep[]): void;
 }
 
 export interface LevelModule {

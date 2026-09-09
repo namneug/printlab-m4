@@ -221,3 +221,59 @@
   .topbar { flex-wrap: wrap; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3); }
   .topbar__right { margin-left: 0; width: 100%; justify-content: flex-end; flex-wrap: wrap; }
 }
+
+/* ---------- แถบนำทางของด่าน ---------- */
+.guide {
+  position: sticky;
+  top: 64px;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  background: color-mix(in srgb, var(--panel) 97%, transparent);
+  border: 1px solid var(--amber);
+  border-left: 5px solid var(--amber);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+}
+.guide__steps { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+.guide__step { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 4px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; color: var(--tx-mut); }
+.guide__step-num { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--panel-3); font-family: var(--font-display); font-weight: 700; font-size: 12px; }
+.guide__step.is-current { border-color: var(--amber); color: var(--tx); background: color-mix(in srgb, var(--amber) 12%, transparent); }
+.guide__step.is-current .guide__step-num { background: var(--amber); color: #1a1206; }
+.guide__step.is-done { color: var(--green); border-color: color-mix(in srgb, var(--green) 50%, var(--line)); }
+.guide__step.is-done .guide__step-num { background: var(--green); color: #06170d; }
+.guide__step.is-done .icon { stroke: #06170d; width: 14px; height: 14px; }
+.guide__row { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; }
+.guide__now { display: flex; align-items: flex-start; gap: var(--sp-2); flex: 1 1 320px; min-width: 0; }
+.guide__icon { color: var(--amber); width: 22px; height: 22px; margin-top: 4px; }
+.guide__label { display: block; font-family: var(--font-display); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber); }
+.guide__text { font-family: var(--font-display); font-weight: 600; font-size: 18px; line-height: 1.4; color: var(--tx); }
+.guide__side { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.guide__progress { font-size: 20px; font-weight: 700; color: var(--cyan); padding: 2px 12px; border: 1px solid color-mix(in srgb, var(--cyan) 40%, var(--line)); border-radius: 999px; }
+.guide__progress[hidden] { display: none; }
+.guide__action { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.guide__primary { min-height: 44px; }
+.guide__primary:disabled { opacity: 0.5; }
+.guide__primary.is-ready { animation: pulse 1.6s ease-in-out 2; }
+.guide__reason { font-size: 12px; color: var(--tx-mut); max-width: 300px; text-align: right; }
+@media (max-width: 900px) {
+  .guide { top: 56px; padding: var(--sp-2) var(--sp-3); }
+  .guide__text { font-size: 16px; }
+  .guide__action { align-items: stretch; width: 100%; }
+  .guide__reason { text-align: left; max-width: none; }
+}
+
+/* ---------- ทัวร์แนะนำหน้าจอ ---------- */
+.tour { position: fixed; inset: 0; z-index: 200; }
+.tour__spot { position: fixed; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(8, 11, 15, 0.72), 0 0 0 3px var(--cyan); transition: left 0.2s, top 0.2s, width 0.2s, height 0.2s; pointer-events: none; }
+.tour__pop { position: fixed; display: flex; flex-direction: column; gap: 6px; padding: var(--sp-3) var(--sp-4); background: var(--panel); border: 1px solid var(--cyan); border-radius: var(--radius-lg); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); }
+.tour__head { display: flex; align-items: center; gap: 6px; color: var(--cyan); font-size: 12px; }
+.tour__count { margin-left: auto; color: var(--tx-mut); }
+.tour__title { font-size: 16px; }
+.tour__text { font-size: 14px; color: var(--tx-2); }
+.tour__actions { display: flex; justify-content: flex-end; gap: var(--sp-2); margin-top: 4px; }
+body.has-tour { overflow: hidden; }

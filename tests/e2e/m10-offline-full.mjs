@@ -1,6 +1,6 @@
 /** เล่นครบ 6 ด่านต่อเนื่องแบบออฟไลน์ (ตัดเน็ตหลังโหลดหน้าแรก) + ตรวจ log ของพี่เลี้ยง */
 import { readFileSync } from 'node:fs';
-import { launch, startSession, assert, report, getEvents, BASE } from './lib.mjs';
+import { dismissTour, launch, startSession, assert, report, getEvents, BASE } from './lib.mjs';
 
 const parts = JSON.parse(readFileSync(new URL('../../src/data/parts.json', import.meta.url), 'utf8'));
 const faults = JSON.parse(readFileSync(new URL('../../src/data/faults.json', import.meta.url), 'utf8'));
@@ -16,18 +16,20 @@ try {
 
   /* ด่าน 1 */
   await page.click('.level-card[href="#/level/l1"]');
-  await page.click('#level-start');
+  await page.click('#level-start'); await dismissTour(page);
   await page.waitForSelector('.l1-tray .part-chip');
   for (const id of Object.keys(subOf)) { await page.click(`.l1-tray .part-chip[data-part="${id}"]`); await page.click(`.bin[data-sub="${subOf[id]}"]`); }
   await page.click('#l1-to-flow');
   for (const [a, b] of [['input', 'process'], ['process', 'output'], ['process', 'feedback'], ['feedback', 'process']]) { await page.click(`.dnode[data-id="${a}"]`); await page.click(`.dnode[data-id="${b}"]`); }
+  await page.click('#guide-primary');
   await page.waitForSelector('.dnode[data-id="thermistor"]');
   for (const [a, b] of [['thermistor', 'mainboard'], ['mainboard', 'hotend_heater']]) { await page.click(`.dnode[data-id="${a}"]`); await page.click(`.dnode[data-id="${b}"]`); }
+  await page.click('#guide-primary');
   await page.waitForSelector('.debrief');
   await page.click('.debrief a.btn--primary');
 
   /* ด่าน 2 */
-  await page.waitForSelector('#level-start'); await page.click('#level-start');
+  await page.waitForSelector('#level-start'); await page.click('#level-start'); await dismissTour(page); await dismissTour(page);
   await page.click('#l2-priority-ok');
   await page.click('#l2-run');
   await page.locator('#l2-infill').fill('30'); await page.click('#l2-run');
@@ -38,7 +40,7 @@ try {
   await page.waitForSelector('.debrief'); await page.click('.debrief a.btn--primary');
 
   /* ด่าน 3 */
-  await page.waitForSelector('#level-start'); await page.click('#level-start');
+  await page.waitForSelector('#level-start'); await page.click('#level-start'); await dismissTour(page); await dismissTour(page);
   await page.waitForSelector('.diag');
   const title = (await page.locator('.diag .panel__head').first().textContent()).replace('อาการ: ', '').trim();
   const c = faults.cases.find((x) => x.title === title);
@@ -52,7 +54,7 @@ try {
   await page.waitForSelector('.debrief'); await page.click('.debrief a.btn--primary');
 
   /* ด่าน 4 */
-  await page.waitForSelector('#level-start'); await page.click('#level-start');
+  await page.waitForSelector('#level-start'); await page.click('#level-start'); await dismissTour(page); await dismissTour(page);
   await page.waitForSelector('#l4-submit');
   const l4 = [['ABS', 'heat_resistance', 250], ['TPU', 'flexibility', 220], ['PLA', 'cost', 210]];
   await page.click('.room-opt[data-room="ventilated"]');
@@ -66,7 +68,7 @@ try {
   await page.waitForSelector('.debrief'); await page.click('.debrief a.btn--primary');
 
   /* ด่าน 5 */
-  await page.waitForSelector('#level-start'); await page.click('#level-start');
+  await page.waitForSelector('#level-start'); await page.click('#level-start'); await dismissTour(page); await dismissTour(page);
   await page.waitForSelector('.edp-steps');
   for (const r of ['load', 'fit', 'no_tools', 'bump', 'time']) await page.check(`label[data-req="${r}"] input`);
   await page.click('#l5-step1-ok');
@@ -84,7 +86,7 @@ try {
   await page.waitForSelector('.debrief'); await page.click('.debrief a.btn--primary');
 
   /* ด่าน 6 */
-  await page.waitForSelector('#level-start'); await page.click('#level-start');
+  await page.waitForSelector('#level-start'); await page.click('#level-start'); await dismissTour(page); await dismissTour(page);
   await page.click('#l6-to-impact');
   for (const s of impact.statements) { await page.click(`.stmt-chip[data-stmt="${s.id}"]`); await page.click(`.impact-bin[data-dim="${s.dimension}"]`); }
   await page.click('#l6-to-decision');

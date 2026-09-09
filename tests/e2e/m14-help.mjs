@@ -1,6 +1,6 @@
 /** คู่มือนักเรียน /help/: 8 ส่วน ค่าจริงจากเกม ลิงก์จากหน้าแรกและแถบบน พิมพ์ได้ อ่านบนมือถือได้ */
 import { readFileSync } from 'node:fs';
-import { launch, startSession, assert, report, BASE, OUT } from './lib.mjs';
+import { dismissTour, launch, startSession, assert, report, BASE, OUT } from './lib.mjs';
 
 const levels = JSON.parse(readFileSync(new URL('../../src/data/levels.json', import.meta.url), 'utf8')).levels;
 const { page, errors, failed, fontIssues, shot, close } = await launch();

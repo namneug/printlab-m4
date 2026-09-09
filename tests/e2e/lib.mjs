@@ -112,3 +112,17 @@ export function report(name, errors, failed = [], fontIssues = []) {
     console.log(`[${name}] OK — no console errors, no failed requests`);
   }
 }
+
+/** ปิดทัวร์แนะนำหน้าจอถ้าขึ้น (ขึ้นครั้งแรกของแต่ละด่าน) */
+export async function dismissTour(page, how = 'skip') {
+  const btn = page.locator(how === 'skip' ? '#tour-skip' : '#tour-next');
+  try {
+    await btn.first().waitFor({ state: 'visible', timeout: 2500 });
+  } catch {
+    return false;
+  }
+  if (how === 'skip') await btn.click();
+  else while (await page.locator('#tour-next').count()) { await page.click('#tour-next'); await page.waitForTimeout(80); }
+  await page.waitForSelector('.tour', { state: 'detached' });
+  return true;
+}

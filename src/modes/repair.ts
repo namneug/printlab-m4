@@ -3,9 +3,11 @@ import { el, append, clear } from '../ui/dom';
 import { icon } from '../ui/icons';
 import type { Screen } from '../ui/router';
 import { createMentorDock } from '../ui/mentorDock';
-import { getSession } from '../game/session';
 import { track } from '../telemetry/events';
-import { randomCase, runDiagnosis, type DiagnosisOutcome } from './diagnosis';
+import { randomCase, runDiagnosis, DIAGNOSIS_TOUR, type DiagnosisOutcome } from './diagnosis';
+import { createGuide } from '../ui/guide';
+import { startTour, endTour } from '../ui/tour';
+import { getSession, getProgress, saveData } from '../game/session';
 import type { Construct } from '../telemetry/schema';
 import { helpLink } from '../ui/helpLink';
 
@@ -21,13 +23,23 @@ export const repairScreen: Screen = (root) => {
     track(eventType, { ...payload, mode: 'repair', pool }, { levelId: 'repair', construct: construct ?? 'maintenance' });
   };
   const dock = createMentorDock({ hintsKey: 'l3', hintLevelMax: 2, track: trackRepair });
+  const guide = createGuide();
+  const tourBtn = el('button', { class: 'btn btn--ghost btn--sm', type: 'button', id: 'tour-replay', title: 'ดูทัวร์แนะนำหน้าจออีกครั้ง', 'aria-label': 'ดูทัวร์แนะนำหน้าจออีกครั้ง' }, icon('info'), '?');
+  const runTour = (requestedBy: 'auto' | 'player'): void => {
+    startTour([
+      { target: '#guide', title: 'แถบนำทาง', text: 'บอกว่าตอนนี้ต้องทำอะไร และมีปุ่มหลักของขั้นนี้ ถ้าปุ่มยังกดไม่ได้ ข้อความใต้ปุ่มจะบอกว่ายังขาดอะไร' },
+      ...DIAGNOSIS_TOUR,
+      { target: dock.hintBtn, title: 'ปุ่มขอคำใบ้', text: 'กดเมื่อติด พี่เลี้ยงจะช่วยชี้ทาง ไม่หักคะแนน จุดสามจุดข้าง ๆ บอกจำนวนครั้งที่เหลือของเคสนี้' },
+    ], { levelId: 'repair', requestedBy, track: (t, p) => track(t, { ...p, mode: 'repair' }, { levelId: 'repair' }) });
+  };
+  tourBtn.addEventListener('click', () => runTour('player'));
 
   const status = el('p', { class: 'levelbar__status', text: 'สุ่มเคสจากคลัง ฝึกได้ไม่จำกัด' });
   const counter = el('span', { class: 'mono', text: '0' });
   const bar = el('header', { class: 'levelbar' },
     el('a', { class: 'btn btn--ghost btn--sm', href: '#/map' }, icon('arrow-left'), 'แผนที่'),
     el('div', { class: 'levelbar__title' }, el('div', { class: 'levelbar__num', text: 'โหมดเปิดตลอด' }), el('h1', { class: 'levelbar__name', text: 'โมดูลซ่อม' }), status),
-    el('div', { class: 'levelbar__right' }, helpLink(), el('span', { class: 'chip chip--green' }, icon('wrench'), el('span', { text: 'ปิดเคสแล้ว ' }), counter), el('span', { class: 'chip' }, dock.dots), dock.hintBtn),
+    el('div', { class: 'levelbar__right' }, tourBtn, helpLink(), el('span', { class: 'chip chip--green' }, icon('wrench'), el('span', { text: 'ปิดเคสแล้ว ' }), counter), el('span', { class: 'chip' }, dock.dots), dock.hintBtn),
   );
   const body = el('main', { class: 'level-body' });
   const page = el('div', { class: 'screen screen--level' }, bar, body, dock.root);
@@ -42,8 +54,13 @@ export const repairScreen: Screen = (root) => {
     lastCase = c.id;
     dock.host.say(`เคสใหม่: ${c.title} หาสาเหตุจากหลักฐานภายในงบเวลา ${c.time_budget} นาที`, 'feed_up');
     const wrap = el('div');
-    body.appendChild(wrap);
-    stop = runDiagnosis(wrap, c, { track: trackRepair, mentor: dock.host, setStatus: (t) => (status.textContent = t) }, (o) => showSummary(o));
+    body.append(guide.root, wrap);
+    stop = runDiagnosis(wrap, c, { track: trackRepair, mentor: dock.host, setStatus: (t) => (status.textContent = t), guide }, (o) => showSummary(o));
+    const seen = (getProgress().data['tutorials'] as Record<string, boolean> | undefined) ?? {};
+    if (!seen['repair']) {
+      void saveData('tutorials', { ...seen, repair: true });
+      requestAnimationFrame(() => runTour('auto'));
+    }
   }
 
   function showSummary(o: DiagnosisOutcome): void {
@@ -72,6 +89,7 @@ export const repairScreen: Screen = (root) => {
 
   startCase();
   return () => {
+    endTour();
     stop?.();
   };
 };

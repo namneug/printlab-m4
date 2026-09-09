@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { launch, startSession, assert, report, getEvents, BASE } from './lib.mjs';
+import { dismissTour, launch, startSession, assert, report, getEvents, BASE } from './lib.mjs';
 
 const parts = JSON.parse(readFileSync(new URL('../../src/data/parts.json', import.meta.url), 'utf8'));
 const { page, errors, shot, close } = await launch();

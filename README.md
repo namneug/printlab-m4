@@ -108,6 +108,7 @@ npm run test:e2e     # e2e ทั้งหมด (ต้องเปิด previ
 - ทุก event เข้า IndexedDB ก่อน แล้วส่งไป `VITE_EVENTS_ENDPOINT` เป็นชุดเมื่อออนไลน์ (ไม่ซ้ำด้วย eventId)
 - ส่งออกได้จากหน้า `#/data` (นักเรียน) และแดชบอร์ดครู: CSV (BOM เปิด Excel ได้) / JSON / สรุปรายคน แยกตาม timepoint และ construct
 - คำใบ้ทุกครั้ง log `trigger hintLevel mentorSource shownAt requestedBy` (event `hint_shown`)
+- ทัวร์แนะนำหน้าจอ (coach marks ครั้งแรกของแต่ละด่าน + ปุ่ม ? ดูซ้ำ) log แยกเป็น `tutorial_shown` `tutorial_step` `tutorial_skipped` `tutorial_completed` พร้อม `requestedBy: auto|player` ไม่ปนกับตัวแปรคำใบ้ ทัวร์และแถบนำทางสอนเฉพาะวิธีใช้หน้าจอ ขึ้นเหมือนกันทุกคน (ไม่สุ่ม)
 
 ## Deploy
 

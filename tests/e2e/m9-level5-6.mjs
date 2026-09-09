@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { launch, startSession, assert, report, getEvents, BASE } from './lib.mjs';
+import { dismissTour, launch, startSession, assert, report, getEvents, BASE } from './lib.mjs';
 
 const impact = JSON.parse(readFileSync(new URL('../../src/data/impact.json', import.meta.url), 'utf8'));
 const { page, errors, shot, close } = await launch();
@@ -8,7 +8,7 @@ try {
   // เล่นด่าน 2 แบบเร็วเพื่อให้ด่าน 6 มีข้อมูล
   await page.goto(BASE + '#/map?free=1', { waitUntil: 'networkidle' });
   await page.click('.level-card[href="#/level/l2"]');
-  await page.click('#level-start');
+  await page.click('#level-start'); await dismissTour(page);
   await page.click('#l2-priority-ok');
   await page.click('#l2-run');
   await page.locator('#l2-infill').fill('30'); await page.click('#l2-run');
@@ -21,7 +21,7 @@ try {
   /* ---------- ด่าน 5 ---------- */
   await page.goto(BASE + '#/map?free=1', { waitUntil: 'networkidle' });
   await page.click('.level-card[href="#/level/l5"]');
-  await page.click('#level-start');
+  await page.click('#level-start'); await dismissTour(page);
   await page.waitForSelector('.edp-steps');
   // พยายามข้ามไปขั้น 4 → ต้องถูกบล็อก
   await page.click('.edp-step[data-step="4"]');
@@ -95,7 +95,7 @@ try {
   /* ---------- ด่าน 6 ---------- */
   await page.goto(BASE + '#/map?free=1', { waitUntil: 'networkidle' });
   await page.click('.level-card[href="#/level/l6"]');
-  await page.click('#level-start');
+  await page.click('#level-start'); await dismissTour(page);
   await page.waitForSelector('#l6-to-impact');
   await shot('m9-l6-numbers');
   const txt = await page.locator('.numbers').textContent();

@@ -1,11 +1,11 @@
-import { launch, startSession, assert, report, getEvents, BASE } from './lib.mjs';
+import { dismissTour, launch, startSession, assert, report, getEvents, BASE } from './lib.mjs';
 
 const { page, errors, shot, close } = await launch();
 try {
   await startSession(page, 'ANON-009');
   await page.goto(BASE + '#/map?free=1', { waitUntil: 'networkidle' });
   await page.click('.level-card[href="#/level/l4"]');
-  await page.click('#level-start');
+  await page.click('#level-start'); await dismissTour(page);
   await page.waitForSelector('#l4-submit');
   const setTemp = (v) => page.locator('#l4-temp').fill(String(v));
   // โจทย์ 1: เลือกผิด (PLA) ก่อน

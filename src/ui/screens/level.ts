@@ -9,6 +9,9 @@ import { createMentor } from '../../mentor';
 import { createMentorDock, MODE_LABEL } from '../mentorDock';
 import type { Construct } from '../../telemetry/schema';
 import { helpLink } from '../helpLink';
+import { createGuide } from '../guide';
+import { startTour, endTour, type TourStep } from '../tour';
+import { getProgress, saveData } from '../../game/session';
 
 export const levelScreen: Screen = (root, params) => {
   const found = levelMeta(params['id'] ?? '');
@@ -29,6 +32,20 @@ export const levelScreen: Screen = (root, params) => {
   }
 
   const dock = createMentorDock({ hintsKey: levelId, hintLevelMax: meta.hintLevelMax, track: trackLevel });
+  const guide = createGuide();
+  let tourSteps: TourStep[] = [];
+  const tourBtn = el('button', { class: 'btn btn--ghost btn--sm', type: 'button', id: 'tour-replay', title: 'ดูทัวร์แนะนำหน้าจออีกครั้ง', 'aria-label': 'ดูทัวร์แนะนำหน้าจออีกครั้ง', hidden: true }, icon('info'), '?');
+  const runTour = (requestedBy: 'auto' | 'player'): void => {
+    if (!tourSteps.length) return;
+    // ทัวร์ชี้แถบนำทาง ปุ่มขอคำใบ้ และองค์ประกอบของด่าน — เนื้อหาเดียวกันทุกคนทุกครั้ง
+    const common: TourStep[] = [
+      { target: '#guide', title: 'แถบนำทาง', text: 'บอกว่าตอนนี้ต้องทำอะไร เหลืออีกเท่าไร และมีปุ่มหลักของขั้นนี้ ถ้าปุ่มยังกดไม่ได้ ข้อความใต้ปุ่มจะบอกว่ายังขาดอะไร' },
+      ...tourSteps,
+      { target: dock.hintBtn, title: 'ปุ่มขอคำใบ้', text: 'กดเมื่อติด พี่เลี้ยงจะช่วยชี้ทาง ไม่หักคะแนน จุดสามจุดข้าง ๆ บอกจำนวนครั้งที่เหลือ ข้อความของพี่เลี้ยงจะขึ้นในกล่องด้านขวา' },
+    ];
+    startTour(common, { levelId, requestedBy, track: (t, p) => track(t, { ...p, elapsedMs: startedAt ? Date.now() - startedAt : 0 }, { levelId }) });
+  };
+  tourBtn.addEventListener('click', () => runTour('player'));
   const page = el('div', { class: 'screen screen--level' });
 
   /* ---------- แถบบน ---------- */
@@ -42,6 +59,7 @@ export const levelScreen: Screen = (root, params) => {
       status,
     ),
     el('div', { class: 'levelbar__right' },
+      tourBtn,
       helpLink(),
       el('span', { class: 'chip chip--muted' }, icon('clock'), timer),
       el('span', { class: 'chip' }, dock.dots),
@@ -104,8 +122,22 @@ export const levelScreen: Screen = (root, params) => {
       setStatus(text) {
         status.textContent = text;
       },
+      guide,
+      defineTour(steps) {
+        tourSteps = steps;
+        tourBtn.hidden = steps.length === 0;
+      },
     };
+    body.appendChild(guide.root);
     unmount = mod.mount(ctx);
+    // ทัวร์ครั้งแรกของด่านนี้ (บันทึกต่อรหัสผู้เล่น) — ขึ้นเหมือนกันทุกคน ไม่สุ่ม
+    const seen = (getProgress().data['tutorials'] as Record<string, boolean> | undefined) ?? {};
+    if (tourSteps.length && !seen[levelId]) {
+      void saveData('tutorials', { ...seen, [levelId]: true });
+      requestAnimationFrame(() => {
+        if (!disposed) runTour('auto');
+      });
+    }
   });
 
   /* ---------- จบด่าน + debrief ---------- */
@@ -140,6 +172,8 @@ export const levelScreen: Screen = (root, params) => {
         ),
       ),
     );
+    endTour();
+    tourBtn.hidden = true;
     clear(body);
     body.appendChild(debrief);
     debrief.scrollIntoView({ block: 'start' });
@@ -151,6 +185,7 @@ export const levelScreen: Screen = (root, params) => {
 
   return () => {
     disposed = true;
+    endTour();
     window.clearInterval(timerId);
     if (startedAt && unmount) trackLevel('level_exit', { durationMs: Date.now() - startedAt, hintsUsed: dock.host.hintsUsed });
     unmount?.();

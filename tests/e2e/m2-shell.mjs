@@ -1,4 +1,4 @@
-import { launch, startSession, assert, report } from './lib.mjs';
+import { dismissTour, launch, startSession, assert, report } from './lib.mjs';
 
 const { page, errors, shot, close } = await launch();
 try {
@@ -15,7 +15,7 @@ try {
   await page.click('.level-card:not(.is-locked)');
   await page.waitForSelector('#level-start');
   await shot('m2-intro');
-  await page.click('#level-start');
+  await page.click('#level-start'); await dismissTour(page);
   await page.waitForSelector('.level-body .empty, .level-body .l1', { timeout: 5000 });
   await page.click('.btn--hint');
   await page.waitForSelector('.mentor__msg');

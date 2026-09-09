@@ -29,6 +29,8 @@ export interface DiagramOptions {
   /** ตัดสินเส้นที่ผู้เล่นลาก */
   onLink(from: string, to: string): LinkVerdict;
   onHover?: (id: string | null) => void;
+  /** เรียกเมื่อเลือก/ยกเลิกต้นทาง (ใช้กับแถบนำทาง) */
+  onSelect?: (id: string | null) => void;
 }
 
 export interface Diagram {
@@ -141,6 +143,7 @@ export function createDiagram(opts: DiagramOptions): Diagram {
   const setSource = (id: string | null): void => {
     for (const n of nodeMap.values()) n.g.classList.toggle('is-source', n.id === id);
     source = id;
+    opts.onSelect?.(id);
   };
 
   function toSvg(ev: PointerEvent): { x: number; y: number } {

@@ -54,6 +54,27 @@ export const level: LevelModule = {
     };
     let disposed = false;
     const timers: number[] = [];
+    const g = ctx.guide;
+    g.setSteps(['จัดกลุ่มชิ้นส่วน', 'ต่อผังระบบ', 'ต่อวงจรป้อนกลับ']);
+    g.setStep(0);
+    ctx.defineTour([
+      { target: '.l1-tray', title: 'ป้ายชื่อชิ้นส่วน', text: 'คลิกป้าย 1 ใบเพื่อเลือก (ป้ายที่เลือกจะมีขอบสีส้ม) หรือกดค้างแล้วลากไปวางในกล่องด้านล่างก็ได้' },
+      { target: '.bins', title: 'กล่องระบบย่อย', text: 'หลังเลือกป้ายแล้ว คลิกกล่อง 1 กล่องเพื่อวาง ถ้าวางไม่ถูกกล่องจะสั่นและป้ายกลับมาให้ลองใหม่ได้ไม่จำกัด' },
+      { target: '.viewport', title: 'โมเดล 3 มิติ', text: 'ลากเพื่อหมุน ล้อเมาส์เพื่อซูม ชี้ที่ชิ้นส่วนในโมเดลหรือที่ป้ายเพื่อดูชื่อและหน้าที่ในกล่องข้อมูลใต้ป้าย' },
+    ]);
+    const updateGrouping = (): void => {
+      const done = state.placed.size;
+      const total = PARTS.length;
+      const prog = { done, total, unit: 'ชิ้น' };
+      if (done === total) {
+        g.instruct('จัดครบทุกชิ้นแล้ว กดปุ่ม "ไปขั้น 2" เพื่อต่อผังระบบ', prog);
+        g.primary({ label: 'ไปขั้น 2: ต่อผังระบบ', enabled: true, onClick: startFlow });
+        return;
+      }
+      const sel = selected ? partById(selected) : null;
+      g.instruct(sel ? `เลือก "${sel.short}" แล้ว คลิกกล่องระบบ 1 กล่องเพื่อวาง (คลิกป้ายเดิมอีกครั้งเพื่อยกเลิก)` : 'คลิกป้ายชื่อชิ้นส่วน 1 ชิ้น แล้วคลิกกล่องระบบที่คิดว่าใช่ (หรือลากป้ายไปวางในกล่อง)', prog);
+      g.primary({ label: 'ไปขั้น 2: ต่อผังระบบ', enabled: false, reason: `ยังเหลืออีก ${total - done} ชิ้นที่ยังไม่ได้จัดกลุ่ม`, onClick: startFlow });
+    };
 
     /* ---------- แผงข้อมูลชิ้นส่วน ---------- */
     const info = el('div', { class: 'part-info is-empty', text: 'ชี้ที่ชิ้นส่วนในโมเดลหรือที่ป้ายชื่อเพื่อดูหน้าที่' });
@@ -76,6 +97,7 @@ export const level: LevelModule = {
     const setSelected = (id: string | null): void => {
       selected = id;
       for (const [pid, c] of chips) c.classList.toggle('is-selected', pid === id);
+      updateGrouping();
     };
 
     const tray = el('div', { class: 'l1-tray', 'aria-label': 'ชิ้นส่วนที่ยังไม่จัดกลุ่ม' });
@@ -232,6 +254,7 @@ export const level: LevelModule = {
       bins,
     );
     ctx.setStatus('จัดกลุ่มแล้ว 0/18 ชิ้น');
+    updateGrouping();
 
     /* ========== ระยะ 2: ผังระบบ ========== */
     function finishGrouping(): void {
@@ -253,12 +276,27 @@ export const level: LevelModule = {
       view.printer.isolate(null);
       ctx.mentor.setTrigger('flow');
       ctx.setStatus('ต่อผังระบบ: ต่อถูกแล้ว 0/4 เส้น');
+      g.setStep(1);
+      const flowGuide = (source: string | null): void => {
+        const total = FLOW_REQUIRED.length;
+        const prog = { done: found.size, total, unit: 'เส้น' };
+        if (found.size === total) {
+          g.instruct('ครบ 4 เส้นแล้ว กดปุ่ม "ไปขั้น 3" เพื่อต่อวงจรป้อนกลับ', prog);
+          g.primary({ label: 'ไปขั้น 3: วงจรป้อนกลับ', enabled: true, onClick: startLoop });
+          return;
+        }
+        const name = source ? FLOW_NODES.find((n) => n.id === source)?.label ?? source : null;
+        g.instruct(name ? `เลือกต้นทาง "${name}" แล้ว คลิกกล่องปลายทางเพื่อลากลูกศร (คลิกกล่องเดิมเพื่อยกเลิก)` : 'คลิกกล่องต้นทาง แล้วคลิกกล่องปลายทาง เพื่อสร้างลูกศร 1 เส้น (หรือลากเมาส์จากกล่องหนึ่งไปอีกกล่อง)', prog);
+        g.primary({ label: 'ไปขั้น 3: วงจรป้อนกลับ', enabled: false, reason: `ยังขาดอีก ${total - found.size} เส้น`, onClick: startLoop });
+      };
+      flowGuide(null);
 
       const progress = el('span', { class: 'mono', text: '0/4 เส้น' });
       diagram = createDiagram({
         width: 800,
         height: 330,
         nodes: FLOW_NODES,
+        onSelect: flowGuide,
         onLink(from, to) {
           const key = `${from}>${to}`;
           if (found.has(key)) return 'duplicate';
@@ -274,7 +312,7 @@ export const level: LevelModule = {
           found.add(key);
           progress.textContent = `${found.size}/4 เส้น`;
           ctx.setStatus(`ต่อผังระบบ: ต่อถูกแล้ว ${found.size}/4 เส้น`);
-          if (found.size === FLOW_REQUIRED.length) timers.push(window.setTimeout(startLoop, 600));
+          flowGuide(null);
           return 'ok';
         },
       });
@@ -288,13 +326,28 @@ export const level: LevelModule = {
     /* ========== ระยะ 3: วงจรป้อนกลับ ========== */
     const loopFound = new Set<string>();
     let loopIdle = 0;
+    let loopStarted = false;
+    const loopGuide = (source: string | null, required = 2): void => {
+      const prog = { done: loopFound.size, total: required, unit: 'เส้น' };
+      if (loopFound.size === required) {
+        g.instruct('ครบ 2 เส้นแล้ว กดปุ่ม "ส่งคำตอบ" เพื่อจบด่าน', prog);
+        g.primary({ label: 'ส่งคำตอบและจบด่าน', enabled: true, onClick: finish });
+        return;
+      }
+      const name = source ? partById(source)?.short ?? source : null;
+      g.instruct(name ? `เลือกต้นทาง "${name}" แล้ว คลิกชิ้นปลายทางเพื่อลากลูกศร (คลิกชิ้นเดิมเพื่อยกเลิก)` : 'คลิกชิ้นต้นทาง แล้วคลิกชิ้นปลายทาง เพื่อสร้างลูกศร 1 เส้น (ต้องมี 2 เส้น มีชิ้นที่ไม่เกี่ยวปนอยู่)', prog);
+      g.primary({ label: 'ส่งคำตอบและจบด่าน', enabled: false, reason: `ยังขาดอีก ${required - loopFound.size} เส้น`, onClick: finish });
+    };
 
     function startLoop(): void {
+      if (loopStarted) return;
+      loopStarted = true;
       diagram?.dispose();
       diagram = null;
       clear(panel);
       ctx.mentor.setTrigger('feedback_loop');
       ctx.setStatus('ระบุวงจรป้อนกลับของอุณหภูมิ');
+      g.setStep(2);
       view.printer.isolate(LOOP_CANDIDATES);
       view.focus('hotend_heater');
 
@@ -317,10 +370,12 @@ export const level: LevelModule = {
       }, 180_000);
       timers.push(loopIdle);
 
+      loopGuide(null, required.length);
       diagram = createDiagram({
         width: 800,
         height: 350,
         nodes,
+        onSelect: (id) => loopGuide(id, required.length),
         onHover(id) {
           view.printer.highlight(id);
           showInfo(id);
@@ -340,10 +395,10 @@ export const level: LevelModule = {
           if (isRequired) {
             loopFound.add(key);
             progress.textContent = `${loopFound.size}/2 เส้น`;
+            loopGuide(null, required.length);
             if (loopFound.size === required.length) {
               state.loopIdentified = true;
               window.clearTimeout(loopIdle);
-              timers.push(window.setTimeout(finish, 700));
             }
           }
           return 'ok';
@@ -357,8 +412,10 @@ export const level: LevelModule = {
       diagram.root.appendChild(el('div', { class: 'diagram__toolbar' }, icon('refresh'), el('span', { text: 'ต้องมี 2 เส้นตามลำดับ วัด → คิด → ลงมือ' }), el('span', { class: 'spacer' }), progress));
     }
 
+    let finished = false;
     function finish(): void {
-      if (disposed) return;
+      if (disposed || finished || !state.loopIdentified) return;
+      finished = true;
       const timeOnTask = Date.now() - ctx.startedAt;
       const accuracy = state.firstTry / PARTS.length;
       ctx.complete(

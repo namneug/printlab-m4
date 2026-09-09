@@ -38,12 +38,19 @@ export const level: LevelModule = {
     let lastRun: PrintParams | null = null;
     let converged = false;
     const timers: number[] = [];
+    const g = ctx.guide;
+    g.setSteps(['จัดลำดับความสำคัญ', 'ทดลองในห้องแล็บ', 'สรุปด่าน']);
+    ctx.defineTour([
+      { target: '.priority__list', title: 'ลำดับความสำคัญ', text: 'ใช้ปุ่มลูกศรข้างแต่ละแถวเพื่อเลื่อนขึ้น–ลง แล้วกดปุ่มยืนยันด้านล่างเพื่อเข้าห้องแล็บ (ในห้องแล็บจะมีสไลเดอร์ ปุ่มทดลองพิมพ์ ผลลัพธ์ และตารางบันทึกรอบ)' },
+    ]);
 
     /* ========== ขั้น 0: จัดลำดับความสำคัญของเงื่อนไข ========== */
     function showPriority(): void {
       clear(root);
       ctx.mentor.setTrigger('general');
       ctx.setStatus('จัดลำดับความสำคัญของเงื่อนไขก่อนเริ่มทดลอง');
+      g.setStep(0);
+      g.instruct('ใช้ปุ่มลูกศรเลื่อนลำดับเงื่อนไขตามที่คิด แล้วกดปุ่ม "ยืนยันลำดับ"');
       const list = el('div', { class: 'priority__list' });
       const render = (): void => {
         clear(list);
@@ -71,6 +78,7 @@ export const level: LevelModule = {
         ctx.track('constraint_priority', { order: [...priority] }, 'problem_solving');
         showLab();
       });
+      g.primary({ label: 'ยืนยันลำดับ แล้วเข้าห้องแล็บ', enabled: true, onClick: () => confirm.click() });
       append(root,
         el('div', { class: 'intro__card', style: 'max-width:720px;margin:0 auto' },
           el('div', { class: 'phase-head' }, el('span', { class: 'phase-head__num', text: '0' }), el('div', {}, el('h2', { text: 'ถ้าผ่านครบทั้ง 3 ข้อไม่ได้ในทันที คุณจะยอมเสียข้อไหนก่อน' }), el('p', { text: 'จัดลำดับจากสำคัญที่สุด (1) ไปน้อยที่สุด (3) ลำดับนี้จะช่วยคุณตัดสินใจเมื่อเจอการแลกได้แลกเสีย' }))),
@@ -88,7 +96,26 @@ export const level: LevelModule = {
     const xsec = el('div');
     const statusRow = el('div', { class: 'constraints' });
     const runBtn = el('button', { class: 'btn btn--primary btn--lg', type: 'button', id: 'l2-run' }, icon('play'), 'ทดลองพิมพ์');
-    const finishWrap = el('div', { class: 'row row--end', hidden: true });
+    const finishBtn = el('button', { class: 'btn btn--cyan btn--lg', type: 'button', id: 'l2-finish', disabled: true }, icon('check'), 'สรุปด่าน') as HTMLButtonElement;
+    const finishReason = el('span', { class: 'guide__reason', text: 'ยังกดไม่ได้: ต้องผ่านเงื่อนไขครบ 3 ข้อในรอบเดียวกันก่อน' });
+    const finishWrap = el('div', { class: 'row row--end' }, finishReason, finishBtn);
+    finishBtn.addEventListener('click', () => {
+      if (converged) finish();
+    });
+    const labGuide = (): void => {
+      const n = trials.length;
+      const last = trials[n - 1];
+      if (converged) {
+        g.setStep(2);
+        g.instruct('ผ่านครบ 3 ข้อแล้ว กดปุ่ม "สรุปด่าน" (หรือปรับสไลเดอร์ทดลองต่อเพื่อดูผลของตัวแปรอื่นก่อนก็ได้)', `ผ่าน 3/3 ข้อ`);
+        g.primary({ label: 'สรุปด่าน', enabled: true, onClick: finish });
+        return;
+      }
+      g.setStep(1);
+      if (!last) g.instruct('ปรับสไลเดอร์ 4 ตัวตามต้องการ แล้วกดปุ่ม "ทดลองพิมพ์" ดูผลลัพธ์ทางขวา', 'รอบที่ 1');
+      else g.instruct(`ดูผลรอบที่ ${n} และเงื่อนไขที่ยังไม่ผ่านทางขวา แล้วปรับสไลเดอร์ กดปุ่ม "ทดลองพิมพ์" อีกครั้ง`, `รอบ ${n} · ผ่าน ${last.check.passed}/3 ข้อ`);
+      g.primary({ label: 'ทดลองพิมพ์', enabled: true, onClick: runTrial });
+    };
 
     function showLab(): void {
       clear(root);
@@ -128,6 +155,13 @@ export const level: LevelModule = {
       renderResults(null, null);
       runBtn.addEventListener('click', runTrial);
       root.appendChild(el('div', { class: 'lab' }, left, right));
+      labGuide();
+      ctx.defineTour([
+        { target: '.lab .slider', title: 'สไลเดอร์ตัวแปร', text: 'ลากเพื่อปรับค่า ตัวเลขสีส้มคือค่าที่ตั้งตอนนี้ กรอบจะเป็นสีส้มเมื่อค่าต่างจากรอบที่ทดลองล่าสุด' },
+        { target: '#l2-run', title: 'ปุ่มทดลองพิมพ์', text: 'กดเพื่อจำลองผลจากค่าที่ตั้ง ทำได้กี่รอบก็ได้ ไม่มีจำกัด' },
+        { target: '.results', title: 'ผลรอบล่าสุด', text: 'การ์ด 4 ใบบอกผลลัพธ์แต่ละอย่าง สีเขียว = ผ่านเงื่อนไข สีแดง = ยังไม่ผ่าน และบอกว่าเปลี่ยนจากรอบก่อนเท่าไร' },
+        { target: '.trials', title: 'บันทึกรอบทดลอง', text: 'ตารางเก็บทุกรอบ คอลัมน์ "เปลี่ยน" บอกว่ารอบนั้นเปลี่ยนตัวแปรกี่ตัว ใช้ย้อนดูเทียบได้' },
+      ]);
       ctx.mentor.say('ค่าเริ่มต้นที่ให้มายังไม่ผ่านเงื่อนไข ลองเปลี่ยนทีละตัวเพื่อดูว่าอะไรส่งผลต่ออะไร', 'feed_forward');
     }
 
@@ -244,12 +278,12 @@ export const level: LevelModule = {
         converged = true;
         ctx.track('converged', { round: trial.round, params: trial.params }, 'problem_solving');
         ctx.mentor.say(`ผ่านครบทั้ง 3 ข้อในรอบที่ ${trial.round} คุณจะทดลองต่อเพื่อดูผลของตัวแปรอื่นก็ได้ หรือสรุปด่านได้เลย`, 'feed_back');
-        finishWrap.hidden = false;
-        const done = el('button', { class: 'btn btn--cyan btn--lg', type: 'button', id: 'l2-finish' }, icon('check'), 'สรุปด่าน');
-        done.addEventListener('click', finish);
-        finishWrap.replaceChildren(el('div', { class: 'notice notice--ok', style: 'flex:1' }, icon('check'), el('div', {}, el('strong', { text: 'ผ่านเงื่อนไขครบทั้ง 3 ข้อ' }), el('p', { text: `ชั้น ${trial.params.layer_height.toFixed(2)} มม. · infill ${trial.params.infill}% · ${trial.params.speed} มม./วิ · ${trial.params.nozzle_temp} °C` }))), done);
+        finishBtn.disabled = false;
+        finishWrap.replaceChildren(el('div', { class: 'notice notice--ok', style: 'flex:1' }, icon('check'), el('div', {}, el('strong', { text: 'ผ่านเงื่อนไขครบทั้ง 3 ข้อ' }), el('p', { text: `ชั้น ${trial.params.layer_height.toFixed(2)} มม. · infill ${trial.params.infill}% · ${trial.params.speed} มม./วิ · ${trial.params.nozzle_temp} °C` }))), finishBtn);
+        labGuide();
         return;
       }
+      labGuide();
       if (!check.all) {
         const failed = CONSTRAINT_DEFS.filter((c) => !check[c.id]).map((c) => c.short).join(', ');
         if (trial.round > 1) void ctx.mentor.explain('not_converged', { passed: check.passed, failed });

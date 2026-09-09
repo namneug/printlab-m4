@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { launch, startSession, assert, report, getEvents, BASE } from './lib.mjs';
+import { dismissTour, launch, startSession, assert, report, getEvents, BASE } from './lib.mjs';
 
 const faults = JSON.parse(readFileSync(new URL('../../src/data/faults.json', import.meta.url), 'utf8'));
 
@@ -59,7 +59,7 @@ try {
   await startSession(page, 'ANON-006');
   await page.goto(BASE + '#/map?free=1', { waitUntil: 'networkidle' });
   await page.click('.level-card[href="#/level/l3"]');
-  await page.click('#level-start');
+  await page.click('#level-start'); await dismissTour(page);
   await page.waitForSelector('.diag');
   await shot('m6-l3-case');
   const c = await solveCase(page, { guessFirst: true, wrongCause: true, wrongElim: true });
@@ -82,6 +82,7 @@ try {
   // โมดูลซ่อม: เล่น 2 เคสติดกัน
   await page.goto(BASE + '#/repair', { waitUntil: 'networkidle' });
   await page.waitForSelector('.diag');
+  await dismissTour(page);
   await shot('m6-repair');
   const r1 = await solveCase(page);
   await page.click('#diag-done');

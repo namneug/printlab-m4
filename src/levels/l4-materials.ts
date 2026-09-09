@@ -44,6 +44,36 @@ export const level: LevelModule = {
       justificationWarned: false,
     };
     ctx.mentor.setTrigger('general');
+    const g = ctx.guide;
+    g.setSteps(DATA.tasks.map((_t, i) => `โจทย์ ${i + 1}`));
+    let solvedCurrent = false;
+    let nextBtnRef: HTMLButtonElement | null = null;
+    const updateGuide = (): void => {
+      g.setStep(st.taskIndex);
+      const prog = `โจทย์ ${st.taskIndex + 1}/${DATA.tasks.length}`;
+      if (solvedCurrent) {
+        g.instruct(st.taskIndex + 1 < DATA.tasks.length ? 'ผ่านโจทย์นี้แล้ว กดปุ่ม "โจทย์ถัดไป"' : 'ผ่านโจทย์สุดท้ายแล้ว กดปุ่ม "สรุปด่าน"', prog);
+        g.primary({ label: st.taskIndex + 1 < DATA.tasks.length ? 'โจทย์ถัดไป' : 'สรุปด่าน', enabled: true, onClick: () => nextBtnRef?.click() });
+        return;
+      }
+      const justCount = justify.querySelectorAll('input:checked').length;
+      if (!st.material) {
+        g.instruct('อ่านโจทย์ แล้วคลิกการ์ดวัสดุ 1 ใบที่คิดว่าเหมาะ (กดปุ่ม "เปิดตารางสมบัติ" เพื่อเทียบก่อนได้)', prog);
+        g.primary({ label: 'ยืนยันวัสดุและการตั้งค่า', enabled: false, reason: 'เลือกวัสดุ 1 ชนิดก่อน', onClick: submit });
+      } else if (justCount === 0) {
+        g.instruct('ติ๊กสมบัติในกล่อง "เหตุผล" ทางขวา ที่ทำให้เลือกวัสดุนี้ อย่างน้อย 1 ข้อ', prog);
+        g.primary({ label: 'ยืนยันวัสดุและการตั้งค่า', enabled: false, reason: 'ติ๊กเหตุผลจากตารางอย่างน้อย 1 ข้อ', onClick: submit });
+      } else {
+        g.instruct('ตรวจสไลเดอร์อุณหภูมิหัวฉีดและสภาพห้อง แล้วกดปุ่ม "ยืนยันวัสดุและการตั้งค่า"', prog);
+        g.primary({ label: 'ยืนยันวัสดุและการตั้งค่า', enabled: true, onClick: submit });
+      }
+    };
+    ctx.defineTour([
+      { target: '.mat-grid', title: 'การ์ดวัสดุ', text: 'คลิกการ์ด 1 ใบเพื่อเลือก การ์ดที่เลือกจะมีขอบสี เปลี่ยนใจคลิกใบอื่นได้' },
+      { target: '#l4-table-toggle', title: 'ตารางสมบัติ', text: 'กดเพื่อเปิด/ซ่อนตารางเทียบสมบัติของวัสดุทั้ง 4 ชนิด' },
+      { target: '.justify', title: 'กล่องเหตุผล', text: 'ติ๊กสมบัติที่เป็นเหตุผลของการเลือก อย่างน้อย 1 ข้อ' },
+      { target: '.settings', title: 'ตั้งค่าการพิมพ์', text: 'สไลเดอร์อุณหภูมิ: กรอบเขียวคือช่วงที่แนะนำของวัสดุที่เลือก เส้นแดงคือพิกัดสูงสุด ด้านล่างเลือกสภาพห้อง แล้วกดปุ่มยืนยันสีส้มด้านล่างขวา' },
+    ]);
 
     const layout = el('div', { class: 'l4' });
     const left = el('div', { class: 'stack' });
@@ -101,13 +131,16 @@ export const level: LevelModule = {
         matGrid.querySelectorAll('.mat-card').forEach((c) => c.classList.toggle('is-selected', c === card));
         ctx.track('material_select', { task: currentTask().id, material: m.id }, 'operation');
         renderTempScale();
+        updateGuide();
       });
       matGrid.appendChild(card);
     }
 
     /* เหตุผลจากตาราง */
     for (const p of DATA.properties) {
-      justify.appendChild(el('label', { class: 'check' }, el('input', { type: 'checkbox', name: 'justify', value: p.key, class: 'checkbox' }), el('span', { text: p.label })));
+      const cb = el('input', { type: 'checkbox', name: 'justify', value: p.key, class: 'checkbox' });
+      cb.addEventListener('change', updateGuide);
+      justify.appendChild(el('label', { class: 'check' }, cb, el('span', { text: p.label })));
     }
 
     /* การตั้งค่า */
@@ -158,8 +191,11 @@ export const level: LevelModule = {
       clear(feedback);
       renderTempScale();
       submitBtn.disabled = false;
+      solvedCurrent = false;
+      nextBtnRef = null;
       ctx.setStatus(`โจทย์ ${st.taskIndex + 1}/${DATA.tasks.length}: ${t.title}`);
       ctx.track('task_start', { task: t.id }, 'operation');
+      updateGuide();
     }
 
     function submit(): void {
@@ -224,7 +260,10 @@ export const level: LevelModule = {
       per.justified = justified;
       ctx.track('task_complete', { task: t.id, material: m.id, correct_first: per.correct_first, justified, justification: justSel, violations: per.violations }, 'operation');
       submitBtn.disabled = true;
-      const next = el('button', { class: 'btn btn--cyan', type: 'button', id: 'l4-next' }, st.taskIndex + 1 < DATA.tasks.length ? 'โจทย์ถัดไป' : 'สรุปด่าน', icon('arrow-right'));
+      const next = el('button', { class: 'btn btn--cyan', type: 'button', id: 'l4-next' }, st.taskIndex + 1 < DATA.tasks.length ? 'โจทย์ถัดไป' : 'สรุปด่าน', icon('arrow-right')) as HTMLButtonElement;
+      nextBtnRef = next;
+      solvedCurrent = true;
+      updateGuide();
       next.addEventListener('click', () => {
         st.taskIndex++;
         if (st.taskIndex >= DATA.tasks.length) finish();

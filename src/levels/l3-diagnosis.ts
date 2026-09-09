@@ -1,6 +1,6 @@
 /** ด่าน 3 — วินิจฉัยเชิงสาเหตุ: ใช้กลไกร่วมจาก modes/diagnosis.ts กับเคสที่กำหนดจากรหัสผู้เล่น */
 import { el } from '../ui/dom';
-import { caseForParticipant, runDiagnosis } from '../modes/diagnosis';
+import { caseForParticipant, runDiagnosis, DIAGNOSIS_TOUR } from '../modes/diagnosis';
 import type { LevelContext, LevelModule } from './context';
 
 export const level: LevelModule = {
@@ -8,7 +8,8 @@ export const level: LevelModule = {
     const root = el('div', { class: 'l3' });
     ctx.root.appendChild(root);
     const c = caseForParticipant(ctx.session.participantCode, 'base');
-    const stop = runDiagnosis(root, c, { track: ctx.track, mentor: ctx.mentor, setStatus: ctx.setStatus }, (o) => {
+    ctx.defineTour(DIAGNOSIS_TOUR);
+    const stop = runDiagnosis(root, c, { track: ctx.track, mentor: ctx.mentor, setStatus: ctx.setStatus, guide: ctx.guide }, (o) => {
       ctx.complete(
         { ...o },
         {

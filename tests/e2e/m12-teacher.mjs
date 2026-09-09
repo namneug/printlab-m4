@@ -1,13 +1,13 @@
 /** แดชบอร์ดครู — ต้อง build ด้วย VITE_TEACHER_PASSWORD=test1234 */
 import { writeFileSync } from 'node:fs';
-import { launch, startSession, assert, report, BASE } from './lib.mjs';
+import { dismissTour, launch, startSession, assert, report, BASE } from './lib.mjs';
 
 const { page, errors, shot, close } = await launch();
 try {
   // สร้างข้อมูลในเบราว์เซอร์นี้ก่อน (ANON-014 เล่นด่าน 1 ครึ่งทาง)
   await startSession(page, 'ANON-014');
   await page.click('.level-card[href="#/level/l1"]');
-  await page.click('#level-start');
+  await page.click('#level-start'); await dismissTour(page);
   await page.waitForSelector('.l1-tray .part-chip');
   await page.click('.btn--hint');
   await page.waitForTimeout(300);

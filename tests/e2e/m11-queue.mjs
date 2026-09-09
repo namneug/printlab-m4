@@ -3,7 +3,7 @@
  * สคริปต์นี้เปิด endpoint จำลองเองที่พอร์ต 4174
  */
 import { createServer } from 'node:http';
-import { launch, startSession, assert, report, BASE } from './lib.mjs';
+import { dismissTour, launch, startSession, assert, report, BASE } from './lib.mjs';
 
 let received = [];
 const server = createServer((req, res) => {
@@ -36,7 +36,7 @@ try {
   await page.context().setOffline(true);
   await page.click('.level-card[href="#/level/l1"]');
   await page.waitForSelector('#level-start');
-  await page.click('#level-start');
+  await page.click('#level-start'); await dismissTour(page);
   await page.waitForSelector('.l1-tray .part-chip');
   await page.waitForTimeout(500);
   const queued = await pending();

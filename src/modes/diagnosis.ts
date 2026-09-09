@@ -8,6 +8,8 @@ import { icon } from '../ui/icons';
 import { illustration } from '../ui/illustrations';
 import type { MentorHost } from '../levels/context';
 import type { Construct } from '../telemetry/schema';
+import type { Guide } from '../ui/guide';
+import type { TourStep } from '../ui/tour';
 
 export interface FaultHypothesis {
   id: string;
@@ -77,7 +79,17 @@ export interface DiagnosisHost {
   track(eventType: string, payload?: Record<string, unknown>, construct?: Construct): void;
   mentor: MentorHost;
   setStatus(text: string): void;
+  /** แถบนำทาง (ถ้ามี) — กลไกจะอัปเดตขั้น/ประโยคสั่งทำ/ปุ่มหลักให้เอง */
+  guide?: Guide;
 }
+
+/** ทัวร์แนะนำหน้าจอของกลไกวินิจฉัย (ใช้ทั้งด่าน 3 และโมดูลซ่อม) — สอนเฉพาะวิธีใช้หน้าจอ */
+export const DIAGNOSIS_TOUR: TourStep[] = [
+  { target: '.diag .panel', title: 'อาการและข้อมูลจากเครื่อง', text: 'ฝั่งซ้ายคือภาพ ข้อความอาการ และค่าที่อ่านได้จากเครื่อง ด้านล่างมีแถบงบเวลาที่จะลดลงเมื่อเลือกการทดสอบ' },
+  { target: '.tests', title: 'รายการการทดสอบ', text: 'คลิกการทดสอบ 1 อย่างเพื่อเก็บหลักฐาน ตัวเลขทางขวาคือเวลาที่ใช้ การทดสอบที่ทำแล้วจะมีเครื่องหมายถูก และหลักฐานจะไปอยู่ในกล่อง "หลักฐานที่เก็บได้"' },
+  { target: '.hypo', title: 'สมมติฐาน', text: 'ปุ่ม "ตัดออก" ข้างแต่ละข้อใช้ตัดข้อที่ขัดกับหลักฐาน กดแล้วเลือกหลักฐานที่ขัด ข้อที่ตัดแล้วจะถูกขีดฆ่า' },
+  { target: '.diag-form', title: 'กล่องสรุปสาเหตุ', text: 'เลือกสาเหตุ 1 ข้อ ติ๊กหลักฐานที่สนับสนุนอย่างน้อย 1 ชิ้น แล้วกด "ส่งคำวินิจฉัย" ถ้ายังไม่ครบระบบจะบอกว่าขาดอะไร' },
+];
 
 const EXTENSION_MIN = 10;
 
@@ -138,6 +150,35 @@ export function runDiagnosis(root: HTMLElement, c: FaultCase, host: DiagnosisHos
   append(wrap, left, right);
 
   const remaining = (): number => st.budget - st.timeSpent;
+  const g = host.guide;
+  g?.setSteps(['เก็บหลักฐาน', 'ตัดสมมติฐาน', 'ส่งคำวินิจฉัย']);
+  let doneBtnRef: HTMLButtonElement | null = null;
+  function citedCount(): number {
+    return formWrap.querySelectorAll('input[name=cite]:checked').length;
+  }
+  function updateGuide(): void {
+    if (!g) return;
+    if (st.solved) {
+      g.setStep(2);
+      g.instruct('วินิจฉัยถูกต้องและมีหลักฐานสนับสนุนแล้ว กดปุ่ม "ปิดเคส"');
+      g.primary({ label: 'ปิดเคส', enabled: true, onClick: () => doneBtnRef?.click() });
+      return;
+    }
+    const ev = st.evidence.length;
+    const cited = citedCount();
+    const step = ev === 0 ? 0 : st.eliminated.size === 0 && !st.chosen ? 1 : 2;
+    g.setStep(step);
+    if (step === 0) g.instruct('คลิกการทดสอบ 1 อย่างในรายการ "การทดสอบที่เลือกได้" เพื่อเก็บหลักฐาน (แต่ละอย่างใช้งบเวลาไม่เท่ากัน)', `หลักฐาน ${ev} ชิ้น`);
+    else if (step === 1) g.instruct('กดปุ่ม "ตัดออก" ที่สมมติฐานที่คิดว่าไม่ใช่ แล้วเลือกหลักฐานที่ขัดกับมัน หรือเก็บหลักฐานเพิ่มก่อนก็ได้', `หลักฐาน ${ev} · ตัดออก ${st.eliminated.size}`);
+    else g.instruct('ในกล่อง "สรุปสาเหตุ" เลือกสาเหตุ 1 ข้อ ติ๊กหลักฐานที่สนับสนุนอย่างน้อย 1 ชิ้น แล้วกดปุ่ม "ส่งคำวินิจฉัย"', `หลักฐาน ${ev} · ตัดออก ${st.eliminated.size}`);
+    const enabled = ev > 0 && Boolean(st.chosen) && cited >= 1;
+    g.primary({
+      label: 'ส่งคำวินิจฉัย',
+      enabled,
+      reason: ev === 0 ? 'ต้องเก็บหลักฐานอย่างน้อย 1 ชิ้นก่อน' : !st.chosen ? 'เลือกสาเหตุ 1 ข้อในกล่องสรุปสาเหตุ' : 'ติ๊กหลักฐานที่สนับสนุนอย่างน้อย 1 ชิ้น',
+      onClick: submitDiagnosis,
+    });
+  }
 
   function renderBudget(): void {
     const pct = Math.min(100, (st.timeSpent / st.budget) * 100);
@@ -190,6 +231,7 @@ export function runDiagnosis(root: HTMLElement, c: FaultCase, host: DiagnosisHos
           renderHypotheses();
           renderForm();
           renderBudget();
+          updateGuide();
         } else {
           st.wrongElims++;
           picker.remove();
@@ -252,6 +294,7 @@ export function runDiagnosis(root: HTMLElement, c: FaultCase, host: DiagnosisHos
     renderTests();
     renderEvidence();
     renderForm();
+    updateGuide();
     if (st.timeSpent > c.time_budget / 2 && st.eliminated.size === 0) {
       void host.mentor.offer('half_budget_no_elimination');
       host.mentor.setTrigger('half_budget_no_elimination');
@@ -281,13 +324,16 @@ export function runDiagnosis(root: HTMLElement, c: FaultCase, host: DiagnosisHos
         st.chosen = h.id;
         host.track('hypothesis_select', { case: c.id, hypothesis: h.id }, 'problem_solving');
         renderHypotheses();
+        updateGuide();
       });
       causeSel.appendChild(el('label', { class: 'check' }, input, el('span', { text: h.text })));
     }
     const cite = el('div', { class: 'stack' });
     if (st.evidence.length === 0) cite.appendChild(el('p', { class: 'muted small', text: 'ยังไม่มีหลักฐานให้อ้าง' }));
     for (const ev of st.evidence) {
-      cite.appendChild(el('label', { class: 'check' }, el('input', { type: 'checkbox', name: 'cite', value: ev.id, class: 'checkbox' }), el('span', { text: ev.evidence })));
+      const cb = el('input', { type: 'checkbox', name: 'cite', value: ev.id, class: 'checkbox' });
+      cb.addEventListener('change', updateGuide);
+      cite.appendChild(el('label', { class: 'check' }, cb, el('span', { text: ev.evidence })));
     }
     const submit = el('button', { class: 'btn btn--primary', type: 'button', id: 'diag-submit' }, icon('flag'), 'ส่งคำวินิจฉัย');
     submit.addEventListener('click', submitDiagnosis);
@@ -333,12 +379,14 @@ export function runDiagnosis(root: HTMLElement, c: FaultCase, host: DiagnosisHos
     renderHypotheses();
     renderTests();
     clear(formWrap);
-    const done = el('button', { class: 'btn btn--cyan btn--lg', type: 'button', id: 'diag-done' }, icon('check'), 'ปิดเคส');
+    const done = el('button', { class: 'btn btn--cyan btn--lg', type: 'button', id: 'diag-done' }, icon('check'), 'ปิดเคส') as HTMLButtonElement;
+    doneBtnRef = done;
     append(formWrap, el('div', { class: 'diag-result' },
       el('div', { class: 'notice notice--ok' }, icon('check'), el('div', {}, el('strong', { text: 'วินิจฉัยถูกต้องและมีหลักฐานสนับสนุน' }), el('p', { text: c.resolution }))),
       el('div', { class: 'row row--end' }, done),
     ));
     host.mentor.say(`สรุปได้จากหลักฐาน ${cited.length} ชิ้น ใช้การทดสอบ ${st.testsDone.length} อย่างใน ${st.timeSpent} นาที`, 'feed_back');
+    updateGuide();
     done.addEventListener('click', () => {
       const outcome: DiagnosisOutcome = {
         case_id: c.id,
@@ -366,6 +414,7 @@ export function runDiagnosis(root: HTMLElement, c: FaultCase, host: DiagnosisHos
   renderTests();
   renderEvidence();
   renderForm();
+  updateGuide();
 
   return () => {
     wrap.remove();

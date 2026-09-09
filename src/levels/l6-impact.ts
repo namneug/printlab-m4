@@ -105,6 +105,12 @@ export const level: LevelModule = {
     };
     ctx.mentor.setTrigger('general');
     ctx.track('own_numbers', { ...own }, 'architecture');
+    const g = ctx.guide;
+    g.setSteps(['ตัวเลขของฉัน', 'ผลกระทบ 4 ด้าน', 'ตัดสินใจเชิงนโยบาย']);
+    ctx.defineTour([
+      { target: '.numbers', title: 'การ์ดตัวเลขของคุณ', text: 'ตัวเลขเหล่านี้คำนวณจากการเล่นของคุณเองในด่านก่อนหน้า ข้อความเล็กใต้ตัวเลขบอกที่มา จะได้ใช้อ้างในขั้นสุดท้าย' },
+      { target: '#l6-to-impact', title: 'ปุ่มไปขั้นถัดไป', text: 'กดเมื่ออ่านครบแล้ว ขั้น B จะมีข้อความให้คลิกแล้วคลิกกล่องด้าน ขั้น C จะมีทางเลือกและช่องติ๊กเหตุผล' },
+    ]);
 
     /* ---------- ขั้น A: ตัวเลขของฉัน ---------- */
     function renderNumbers(): void {
@@ -121,6 +127,9 @@ export const level: LevelModule = {
       );
       const next = el('button', { class: 'btn btn--primary', type: 'button', id: 'l6-to-impact' }, 'ประเมินผลกระทบ 4 ด้าน', icon('arrow-right'));
       next.addEventListener('click', renderImpact);
+      g.setStep(0);
+      g.instruct('อ่านการ์ดตัวเลขของคุณ แล้วกดปุ่ม "ประเมินผลกระทบ 4 ด้าน"');
+      g.primary({ label: 'ประเมินผลกระทบ 4 ด้าน', enabled: true, onClick: renderImpact });
       append(root,
         el('div', { class: 'phase-head' }, el('span', { class: 'phase-head__num', text: 'A' }), el('div', {}, el('h2', { text: 'ตัวเลขของฉันจากด่าน 1–5' }), el('p', { text: own.hasData ? `ที่มา: ${own.sources.join(' · ')}` : 'ยังไม่มีข้อมูลจากด่าน 2 และ 5 (ตัวเลขเป็น 0) กลับไปเล่นด่านก่อนหน้าเพื่อให้ตัวเลขมีความหมาย' }))),
         grid,
@@ -139,9 +148,23 @@ export const level: LevelModule = {
       const bins = el('div', { class: 'impact-bins' });
       const chips = new Map<string, HTMLElement>();
       const binItems = new Map<string, HTMLElement>();
+      const total = D.statements.length;
+      const guideB = (): void => {
+        const n = st.placed.size;
+        const prog = { done: n, total, unit: 'ข้อ' };
+        if (n === total) {
+          g.instruct('จัดครบทุกข้อแล้ว กดปุ่ม "ตัดสินใจเชิงนโยบาย"', prog);
+          g.primary({ label: 'ตัดสินใจเชิงนโยบาย', enabled: true, onClick: renderDecision });
+          return;
+        }
+        g.instruct(selectedStmt ? 'เลือกข้อความแล้ว คลิกกล่องด้าน 1 กล่องที่คิดว่าข้อความนี้กระทบมากที่สุด (คลิกข้อความเดิมเพื่อยกเลิก)' : 'คลิกข้อความ 1 ข้อ แล้วคลิกกล่องด้านที่คิดว่าใช่ (+ ผลบวก − ผลลบ)', prog);
+        g.primary({ label: 'ตัดสินใจเชิงนโยบาย', enabled: false, reason: `ยังเหลืออีก ${total - n} ข้อ`, onClick: renderDecision });
+      };
+      g.setStep(1);
       const setSel = (id: string | null): void => {
         selectedStmt = id;
         for (const [sid, c] of chips) c.classList.toggle('is-selected', sid === id);
+        guideB();
       };
       for (const s of shuffle(D.statements)) {
         const chip = el('button', { class: 'stmt-chip', type: 'button', 'data-stmt': s.id }, el('span', { class: `sign ${s.sign === '+' ? 'sign--plus' : 'sign--minus'}`, text: s.sign }), el('span', { text: s.text }));
@@ -191,6 +214,7 @@ export const level: LevelModule = {
         });
         bins.appendChild(bin);
       }
+      guideB();
       append(root,
         el('div', { class: 'phase-head' }, el('span', { class: 'phase-head__num', text: 'B' }), el('div', {}, el('h2', { text: 'ผลกระทบ 4 ด้านของเครื่องพิมพ์ 3 มิติในโรงเรียน' }), el('p', { text: 'คลิกข้อความ แล้วคลิกด้านที่มันกระทบมากที่สุด (+ ผลบวก − ผลลบ)' }))),
         tray, bins,
@@ -208,6 +232,7 @@ export const level: LevelModule = {
           st.decision = o.id;
           opts.querySelectorAll('.option').forEach((x) => x.classList.toggle('is-selected', x === b));
           ctx.track('decision_select', { decision: o.id }, 'problem_solving');
+          guideC();
         });
         opts.appendChild(b);
       }
@@ -220,11 +245,20 @@ export const level: LevelModule = {
         ...D.generic_claims.map((g) => ({ id: g.id, text: g.text, own: false })),
       ];
       const arg = el('div', { class: 'argument' });
-      for (const c of shuffle(ownChips)) {
-        arg.appendChild(el('label', { class: `stmt${c.own ? ' is-own' : ''}` }, el('input', { type: 'checkbox', name: 'arg', value: c.id }), el('span', { text: c.text })));
-      }
       const fb = el('div');
       const submit = el('button', { class: 'btn btn--cyan btn--lg', type: 'button', id: 'l6-submit' }, icon('check'), 'สรุปนโยบายพร้อมเหตุผล');
+      const guideC = (): void => {
+        const n = arg.querySelectorAll('input:checked').length;
+        g.instruct('คลิกทางเลือก 1 ข้อ แล้วติ๊กเหตุผลสนับสนุนในกล่องด้านล่าง จากนั้นกดปุ่ม "สรุปนโยบายพร้อมเหตุผล"', `ติ๊กแล้ว ${n} ข้อ`);
+        g.primary({ label: 'สรุปนโยบายพร้อมเหตุผล', enabled: Boolean(st.decision) && n >= 1, reason: !st.decision ? 'เลือกทางเลือกนโยบาย 1 ข้อ' : 'ติ๊กเหตุผลสนับสนุนอย่างน้อย 1 ข้อ', onClick: () => submit.click() });
+      };
+      for (const c of shuffle(ownChips)) {
+        const cb = el('input', { type: 'checkbox', name: 'arg', value: c.id });
+        cb.addEventListener('change', guideC);
+        arg.appendChild(el('label', { class: `stmt${c.own ? ' is-own' : ''}` }, cb, el('span', { text: c.text })));
+      }
+      g.setStep(2);
+      guideC();
       submit.addEventListener('click', () => {
         clear(fb);
         if (!st.decision) {

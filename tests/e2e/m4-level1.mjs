@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { launch, startSession, assert, report, getEvents } from './lib.mjs';
+import { dismissTour, launch, startSession, assert, report, getEvents } from './lib.mjs';
 
 const parts = JSON.parse(readFileSync(new URL('../../src/data/parts.json', import.meta.url), 'utf8'));
 const subOf = Object.fromEntries(parts.parts.map((p) => [p.id, p.subsystem]));
@@ -8,7 +8,7 @@ const { page, errors, shot, close } = await launch();
 try {
   await startSession(page, 'ANON-004');
   await page.click('.level-card:not(.is-locked)');
-  await page.click('#level-start');
+  await page.click('#level-start'); await dismissTour(page);
   await page.waitForSelector('.l1-tray .part-chip');
   await shot('m4-l1-grouping');
 
@@ -42,6 +42,7 @@ try {
     await page.waitForTimeout(100);
   }
   await shot('m4-l1-flow');
+  await page.click('#guide-primary');
   await page.waitForSelector('.dnode[data-id="thermistor"]');
   // เส้นผิดหนึ่งเส้น แล้วต่อวงจรป้อนกลับให้ถูก
   await page.click('.dnode[data-id="touchscreen"]');
@@ -52,6 +53,7 @@ try {
   await page.click('.dnode[data-id="mainboard"]');
   await page.click('.dnode[data-id="mainboard"]');
   await page.click('.dnode[data-id="hotend_heater"]');
+  await page.click('#guide-primary');
   await page.waitForSelector('.debrief', { timeout: 10000 });
   await shot('m4-l1-debrief');
   assert((await page.locator('.debrief__sec').count()) === 3, 'debrief ต้องมี 3 ส่วน');

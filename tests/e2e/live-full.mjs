@@ -3,7 +3,7 @@
  * เล่นครบ 6 ด่าน + โหมดสำรวจ + โมดูลซ่อม + ส่งออกไฟล์นักเรียน + หน้าครูนำเข้าไฟล์ เก็บ console error และ request ล้มเหลวทุกหน้า
  */
 import { readFileSync, copyFileSync } from 'node:fs';
-import { launch, assert, report, getEvents, routedContext, BASE, OUT } from './lib.mjs';
+import { dismissTour, launch, assert, report, getEvents, routedContext, BASE, OUT } from './lib.mjs';
 
 const parts = JSON.parse(readFileSync(new URL('../../src/data/parts.json', import.meta.url), 'utf8'));
 const faults = JSON.parse(readFileSync(new URL('../../src/data/faults.json', import.meta.url), 'utf8'));
@@ -28,20 +28,22 @@ try {
 
   /* ด่าน 1 */
   await page.click('.level-card[href="#/level/l1"]');
-  await page.click('#level-start');
+  await page.click('#level-start'); await dismissTour(page);
   await page.waitForSelector('.l1-tray .part-chip');
   for (const id of Object.keys(subOf)) { await page.click(`.l1-tray .part-chip[data-part="${id}"]`); await page.click(`.bin[data-sub="${subOf[id]}"]`); }
   await page.click('#l1-to-flow');
   for (const [a, b] of [['input', 'process'], ['process', 'output'], ['process', 'feedback'], ['feedback', 'process']]) { await page.click(`.dnode[data-id="${a}"]`); await page.click(`.dnode[data-id="${b}"]`); }
+  await page.click('#guide-primary');
   await page.waitForSelector('.dnode[data-id="thermistor"]');
   for (const [a, b] of [['thermistor', 'mainboard'], ['mainboard', 'hotend_heater']]) { await page.click(`.dnode[data-id="${a}"]`); await page.click(`.dnode[data-id="${b}"]`); }
+  await page.click('#guide-primary');
   await page.waitForSelector('.debrief');
   await shot('live-l1');
   await page.click('.debrief a.btn--primary');
   step('ด่าน 1');
 
   /* ด่าน 2 */
-  await page.waitForSelector('#level-start'); await page.click('#level-start');
+  await page.waitForSelector('#level-start'); await page.click('#level-start'); await dismissTour(page); await dismissTour(page);
   await page.click('#l2-priority-ok');
   await page.click('#l2-run');
   await page.locator('#l2-infill').fill('30'); await page.click('#l2-run');
@@ -76,14 +78,14 @@ try {
     await page.waitForSelector('#diag-done');
     return c.id;
   };
-  await page.waitForSelector('#level-start'); await page.click('#level-start');
+  await page.waitForSelector('#level-start'); await page.click('#level-start'); await dismissTour(page); await dismissTour(page);
   const l3case = await solveCase();
   await page.click('#diag-done');
   await page.waitForSelector('.debrief'); await page.click('.debrief a.btn--primary');
   step('ด่าน 3 (' + l3case + ')');
 
   /* ด่าน 4 */
-  await page.waitForSelector('#level-start'); await page.click('#level-start');
+  await page.waitForSelector('#level-start'); await page.click('#level-start'); await dismissTour(page); await dismissTour(page);
   await page.waitForSelector('#l4-submit');
   await page.click('.room-opt[data-room="ventilated"]');
   await page.click('#l4-table-toggle');
@@ -98,7 +100,7 @@ try {
   step('ด่าน 4');
 
   /* ด่าน 5 */
-  await page.waitForSelector('#level-start'); await page.click('#level-start');
+  await page.waitForSelector('#level-start'); await page.click('#level-start'); await dismissTour(page); await dismissTour(page);
   await page.waitForSelector('.edp-steps');
   for (const r of ['load', 'fit', 'no_tools', 'bump', 'time']) await page.check(`label[data-req="${r}"] input`);
   await page.click('#l5-step1-ok');
@@ -117,7 +119,7 @@ try {
   step('ด่าน 5');
 
   /* ด่าน 6 */
-  await page.waitForSelector('#level-start'); await page.click('#level-start');
+  await page.waitForSelector('#level-start'); await page.click('#level-start'); await dismissTour(page); await dismissTour(page);
   await page.click('#l6-to-impact');
   for (const s of impact.statements) { await page.click(`.stmt-chip[data-stmt="${s.id}"]`); await page.click(`.impact-bin[data-dim="${s.dimension}"]`); }
   await page.click('#l6-to-decision');
@@ -150,6 +152,8 @@ try {
 
   /* โมดูลซ่อม 2 เคส */
   await page.click('.mode-card[href="#/repair"]');
+  await page.waitForSelector('.diag');
+  await dismissTour(page);
   const r1 = await solveCase();
   await page.click('#diag-done'); await page.waitForSelector('#repair-next'); await page.click('#repair-next');
   const r2 = await solveCase();

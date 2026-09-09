@@ -79,6 +79,13 @@ export const level: LevelModule = {
       violations: 0,
     };
     ctx.mentor.setTrigger('general');
+    const g = ctx.guide;
+    g.setSteps(STEP_NAMES);
+    ctx.defineTour([
+      { target: '.edp-steps', title: 'แถบขั้นทั้ง 5', text: 'ด่านนี้มี 5 ขั้น ทำตามลำดับ ขั้นที่ทำอยู่มีขอบสีส้ม ขั้นที่ผ่านแล้วมีขอบสีเขียว กดขั้นที่ผ่านแล้วเพื่อกลับไปดูได้ แต่ข้ามไปขั้นข้างหน้าไม่ได้' },
+      { target: '.l5 .stack', title: 'พื้นที่ของขั้นปัจจุบัน', text: 'เนื้อหาตรงนี้เปลี่ยนตามขั้น ทำตามหัวข้อที่มีตัวเลขวงกลม แล้วกดปุ่มสีส้มด้านล่างขวา (หรือปุ่มหลักในแถบนำทางด้านบน) เพื่อไปขั้นถัดไป' },
+    ]);
+    const setPrimary = (label: string, enabled: boolean, reason: string, onClick: () => void): void => g.primary({ label, enabled, reason, onClick });
 
     const stepsBar = el('div', { class: 'edp-steps' });
     const content = el('div', { class: 'stack' });
@@ -114,6 +121,7 @@ export const level: LevelModule = {
       st.step = n;
       ctx.track('edp_step_enter', { step: n, round: st.round }, 'problem_solving');
       ctx.setStatus(`ขั้น ${n}/5 ${STEP_NAMES[n - 1] ?? ''} · รอบที่ ${st.round}`);
+      g.setStep(n - 1);
       renderSteps();
       clear(content);
       if (n === 1) renderStep1();
@@ -136,12 +144,22 @@ export const level: LevelModule = {
     /* ---------- ขั้น 1 ---------- */
     function renderStep1(): void {
       const list = el('div', { class: 'stack' });
+      const guide1 = (): void => {
+        const n = st.reqs.size;
+        g.instruct('อ่านสถานการณ์ แล้วติ๊กเงื่อนไขที่คิดว่าชิ้นงานต้องผ่านจริง จากนั้นกดปุ่ม "ยืนยันเงื่อนไข"', `เลือกแล้ว ${n} ข้อ`);
+        setPrimary('ยืนยันเงื่อนไข', n >= M.min_requirements, `ต้องเลือกอย่างน้อย ${M.min_requirements} ข้อ`, () => btn.click());
+      };
       for (const r of M.requirements) {
         const input = el('input', { type: 'checkbox', class: 'checkbox', value: r.id, checked: st.reqs.has(r.id) }) as HTMLInputElement;
-        input.addEventListener('change', () => (input.checked ? st.reqs.add(r.id) : st.reqs.delete(r.id)));
+        input.addEventListener('change', () => {
+          if (input.checked) st.reqs.add(r.id);
+          else st.reqs.delete(r.id);
+          guide1();
+        });
         list.appendChild(el('label', { class: 'check', 'data-req': r.id }, input, el('span', { text: r.text })));
       }
       const btn = el('button', { class: 'btn btn--primary', type: 'button', id: 'l5-step1-ok' }, 'ยืนยันเงื่อนไข', icon('arrow-right'));
+      guide1();
       btn.addEventListener('click', () => {
         const relevant = [...st.reqs].filter((id) => M.requirements.find((r) => r.id === id)?.relevant).length;
         const irrelevant = st.reqs.size - relevant;
@@ -173,12 +191,20 @@ export const level: LevelModule = {
           }
           body.hidden = false;
           card.classList.add('is-open');
+          guide2();
         });
         grid.appendChild(card);
       }
       const input = el('input', { class: 'input mono', type: 'number', id: 'l5-measure', placeholder: '?', style: 'max-width:140px' }) as HTMLInputElement;
       const fb = el('p', { class: 'help' });
       const btn = el('button', { class: 'btn btn--primary', type: 'button', id: 'l5-step2-ok' }, 'ยืนยันข้อมูล', icon('arrow-right'));
+      function guide2(): void {
+        const n = st.cards.size;
+        g.instruct(`คลิกการ์ดข้อมูลเพื่อเปิดอ่าน (อย่างน้อย ${M.min_cards} ใบ) แล้วกรอกตัวเลขในช่องด้านล่าง จากนั้นกดปุ่ม "ยืนยันข้อมูล"`, `เปิดแล้ว ${n}/${M.min_cards} ใบ`);
+        setPrimary('ยืนยันข้อมูล', n >= M.min_cards && input.value.trim() !== '', n < M.min_cards ? `เปิดการ์ดอีก ${M.min_cards - n} ใบ` : 'กรอกตัวเลขในช่องคำตอบ', () => btn.click());
+      }
+      input.addEventListener('input', guide2);
+      guide2();
       btn.addEventListener('click', () => {
         st.measureAttempts++;
         st.measureOk = Number(input.value) === M.measurement_question.answer;
@@ -207,6 +233,7 @@ export const level: LevelModule = {
         b.addEventListener('click', () => {
           d.sketch = s.id;
           sketches.querySelectorAll('.sketch').forEach((x) => x.classList.toggle('is-selected', x === b));
+          guide3();
         });
         sketches.appendChild(b);
       }
@@ -216,6 +243,7 @@ export const level: LevelModule = {
         b.addEventListener('click', () => {
           d.material = m.id;
           mats.querySelectorAll('.mat-pill').forEach((x) => x.classList.toggle('is-selected', x === b));
+          guide3();
         });
         mats.appendChild(b);
       }
@@ -232,11 +260,21 @@ export const level: LevelModule = {
       const reasons = el('div', { class: 'stack' });
       for (const r of M.design_reasons) {
         const input = el('input', { type: 'radio', name: 'design-reason', value: r.id, class: 'checkbox', checked: d.reason === r.id }) as HTMLInputElement;
-        input.addEventListener('change', () => (d.reason = r.id));
+        input.addEventListener('change', () => {
+          d.reason = r.id;
+          guide3();
+        });
         reasons.appendChild(el('label', { class: 'check' }, input, el('span', { text: r.text })));
       }
       const fb = el('div');
       const btn = el('button', { class: 'btn btn--primary', type: 'button', id: 'l5-step3-ok' }, 'ยืนยันแบบ แล้วไปสร้างและทดสอบ', icon('arrow-right'));
+      function guide3(): void {
+        const have = [d.sketch, d.material, d.reason].filter(Boolean).length;
+        const missing = [!d.sketch && 'แบบร่าง', !d.material && 'วัสดุ', !d.reason && 'เหตุผล'].filter(Boolean).join(', ');
+        g.instruct(st.round > 1 ? `รอบที่ ${st.round}: แก้แบบร่าง วัสดุ หรือสไลเดอร์อย่างน้อย 1 อย่างจากรอบก่อน แล้วกดปุ่ม "ยืนยันแบบ"` : 'คลิกเลือกแบบร่าง 1 แบบ วัสดุ 1 ชนิด ปรับสไลเดอร์ตามต้องการ แล้วติ๊กเหตุผล จากนั้นกดปุ่ม "ยืนยันแบบ"', `เลือกแล้ว ${have}/3 อย่าง`);
+        setPrimary('ยืนยันแบบ แล้วไปทดสอบ', have === 3, `ยังไม่ได้เลือก: ${missing}`, () => btn.click());
+      }
+      guide3();
       btn.addEventListener('click', () => {
         clear(fb);
         if (!d.sketch || !d.material || !d.reason) {
@@ -326,11 +364,21 @@ export const level: LevelModule = {
             el('span', { class: 'test-card__verdict' }, icon(ok ? 'check' : 'x'), el('span', { text: ok ? 'ผ่าน' : 'ไม่ผ่าน' }))));
         }
       };
+      const guide4 = (): void => {
+        if (r.results) {
+          g.instruct('ดูผลการทดสอบทั้ง 6 ใบ (เขียว = ผ่าน แดง = ไม่ผ่าน) แล้วกดปุ่ม "ไปขั้น 5"', `ผ่าน ${r.passed ?? 0}/6`);
+          setPrimary('ไปขั้น 5: ปรับปรุงและนำเสนอ', true, '', () => nextBtn.click());
+        } else {
+          g.instruct('กดปุ่ม "สร้างและทดสอบ" เพื่อจำลองการพิมพ์และดูผลการทดสอบ 6 อย่าง', `รอบที่ ${r.round}`);
+          setPrimary('สร้างและทดสอบ (จำลอง)', true, '', () => runBtn.click());
+        }
+      };
       if (r.results) {
         show();
         runBtn.hidden = true;
         nextBtn.hidden = false;
       }
+      guide4();
       runBtn.addEventListener('click', () => {
         evaluate(r);
         if (r.results?.safety) {
@@ -342,6 +390,7 @@ export const level: LevelModule = {
         show();
         runBtn.hidden = true;
         nextBtn.hidden = false;
+        guide4();
         ctx.mentor.say(`รอบที่ ${r.round}: ผ่าน ${r.passed}/6 การทดสอบ ${r.passed === 6 ? 'ผ่านหมดแล้ว แต่กระบวนการยังต้องมีรอบปรับปรุงเพื่อยืนยันว่าแบบนี้ดีที่สุดจริง' : 'ดูว่าข้อที่ไม่ผ่านเกี่ยวกับแบบ วัสดุ หรือการตั้งค่า'}`, 'feed_back');
       });
       nextBtn.addEventListener('click', () => completeStep(4));
@@ -377,6 +426,8 @@ export const level: LevelModule = {
         el('div', { class: 'panel' }, el('div', { class: 'panel__head' }, icon('chart'), 'ผลทดสอบทุกรอบ'), el('div', { class: 'panel__body' }, summary)));
       if (st.rounds.length < 2) {
         append(content, el('div', { class: 'notice' }, icon('info'), el('p', { text: 'ยังนำเสนอไม่ได้ ต้องปรับปรุงและทดสอบอีกอย่างน้อย 1 รอบ (แม้รอบแรกจะผ่านหมด ก็ลองปรับให้ประหยัดหรือเร็วขึ้น)' })), el('div', { class: 'row row--end' }, iterateBtn));
+        g.instruct('ดูผลรอบแรก แล้วกดปุ่ม "ปรับปรุง: เริ่มรอบที่ 2" เพื่อกลับไปแก้แบบในขั้น 3', `รอบที่ ${st.rounds.length}`);
+        setPrimary(`ปรับปรุง: เริ่มรอบที่ ${st.round + 1}`, true, '', () => iterateBtn.click());
         return;
       }
       /* เหตุผลการเปลี่ยน */
@@ -396,9 +447,20 @@ export const level: LevelModule = {
         { id: 'gen2', text: 'เพื่อน ๆ บอกว่าชอบ', own: false },
       ];
       const stmtList = el('div', { class: 'stack' });
-      for (const s of stmts) stmtList.appendChild(el('label', { class: `stmt${s.own ? ' is-own' : ''}` }, el('input', { type: 'checkbox', name: 'stmt', value: s.id }), el('span', { text: s.text })));
       const fb = el('div');
       const presentBtn = el('button', { class: 'btn btn--cyan btn--lg', type: 'button', id: 'l5-present' }, icon('flag'), 'นำเสนอและจบภารกิจ');
+      const guide5 = (): void => {
+        const n = stmtList.querySelectorAll('input:checked').length;
+        g.instruct('เลือกเหตุผลของการเปลี่ยน 1 ข้อ ติ๊กข้อความนำเสนออย่างน้อย 3 ข้อ (ต้องมีแถบสีฟ้า) แล้วกดปุ่ม "นำเสนอและจบภารกิจ"', `ติ๊กแล้ว ${n}/3 ข้อ`);
+        setPrimary('นำเสนอและจบภารกิจ', Boolean(st.changeReason) && n >= 3, !st.changeReason ? 'เลือกเหตุผลของการเปลี่ยน 1 ข้อ' : `ติ๊กข้อความนำเสนออีก ${3 - n} ข้อ`, () => presentBtn.click());
+      };
+      for (const s of stmts) {
+        const cb = el('input', { type: 'checkbox', name: 'stmt', value: s.id });
+        cb.addEventListener('change', guide5);
+        stmtList.appendChild(el('label', { class: `stmt${s.own ? ' is-own' : ''}` }, cb, el('span', { text: s.text })));
+      }
+      for (const inp of reasons.querySelectorAll('input')) inp.addEventListener('change', guide5);
+      guide5();
       presentBtn.addEventListener('click', () => {
         clear(fb);
         const reason = M.change_reasons.find((r) => r.id === st.changeReason);

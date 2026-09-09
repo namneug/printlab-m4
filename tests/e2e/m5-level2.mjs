@@ -1,11 +1,11 @@
-import { launch, startSession, assert, report, getEvents, BASE } from './lib.mjs';
+import { dismissTour, launch, startSession, assert, report, getEvents, BASE } from './lib.mjs';
 
 const { page, errors, shot, close } = await launch();
 try {
   await startSession(page, 'ANON-005');
   await page.goto(BASE + '#/map?free=1', { waitUntil: 'networkidle' });
   await page.click('.level-card[href="#/level/l2"]');
-  await page.click('#level-start');
+  await page.click('#level-start'); await dismissTour(page);
   await page.waitForSelector('#l2-priority-ok');
   // เลื่อน "เวลา" ขึ้นเป็นอันดับ 1
   await page.click('.priority__item[data-id="time"] button[aria-label="เลื่อนขึ้น"]');

@@ -1,6 +1,7 @@
 /**
  * แดชบอร์ดครูและนักวิจัย (/teacher/) — แสดงเฉพาะรหัสนิรนาม
- * ป้องกันด้วยรหัสผ่านอย่างง่ายจาก VITE_TEACHER_PASSWORD (ตั้งตอน build) · ไม่ตั้ง = ปิดการเข้าถึง
+ * ป้องกันด้วยรหัสผ่านอย่างง่ายจาก VITE_TEACHER_PASSWORD (ตั้งตอน build)
+ * ถ้าไม่ได้ตั้ง จะใช้รหัสสำรอง FALLBACK_PASSWORD ในโค้ดและขึ้นคำเตือนบนหน้าจอว่ายังไม่ได้ตั้งรหัสจริง (ไม่ปิดการเข้าถึง)
  * แหล่งข้อมูล: IndexedDB ของเบราว์เซอร์นี้ + ไฟล์ export ของนักเรียน (JSON/CSV) + api/teacher (ถ้าตั้ง VITE_TEACHER_API)
  */
 import '../styles/base.css';
@@ -14,7 +15,11 @@ import type { GameEvent } from '../telemetry/schema';
 import { LEVELS } from '../levels';
 import { ROSTER_SIZE } from '../game/session';
 
-const PASSWORD = (import.meta.env['VITE_TEACHER_PASSWORD'] as string | undefined)?.trim() ?? '';
+const ENV_PASSWORD = (import.meta.env['VITE_TEACHER_PASSWORD'] as string | undefined)?.trim() ?? '';
+/** รหัสสำรองเมื่อยังไม่ได้ตั้ง secret TEACHER_PASSWORD — เปลี่ยนได้ที่นี่ และควรตั้ง secret จริงโดยเร็ว */
+const FALLBACK_PASSWORD = 'printlab-teacher';
+const USING_FALLBACK = ENV_PASSWORD === '';
+const PASSWORD = USING_FALLBACK ? FALLBACK_PASSWORD : ENV_PASSWORD;
 const API = (import.meta.env['VITE_TEACHER_API'] as string | undefined)?.trim() ?? '';
 const TIMEPOINTS = ['O1', 'X', 'O2', 'O3', 'O4'] as const;
 const TP_LABEL: Record<string, string> = { O1: 'O1 ก่อนเรียน', X: 'X ระหว่างเรียน', O2: 'O2 หลังเรียน', O3: 'O3 ติดตาม 2 สัปดาห์', O4: 'O4 ติดตาม 4 สัปดาห์' };
@@ -27,7 +32,7 @@ if (!app) throw new Error('ไม่พบ #app');
 /* ---------- ประตูรหัสผ่าน ---------- */
 function gate(onPass: () => void): void {
   const ok = (): boolean => sessionStorage.getItem('printlab-teacher') === '1';
-  if (ok() && PASSWORD) {
+  if (ok()) {
     onPass();
     return;
   }
@@ -36,7 +41,7 @@ function gate(onPass: () => void): void {
   const form = el('form', { class: 'form' }, el('div', { class: 'field' }, el('label', { class: 'label', for: 'teacher-pass', text: 'รหัสผ่านครู/นักวิจัย' }), input, err), el('button', { class: 'btn btn--primary', type: 'submit' }, icon('lock'), 'เข้าสู่แดชบอร์ด'));
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (PASSWORD && input.value === PASSWORD) {
+    if (input.value === PASSWORD) {
       sessionStorage.setItem('printlab-teacher', '1');
       onPass();
     } else {
@@ -48,10 +53,18 @@ function gate(onPass: () => void): void {
   (app as HTMLElement).appendChild(el('div', { class: 'gate' }, el('div', { class: 'card' },
     el('div', { class: 'brand brand--lg' }, icon('printer'), el('span', { class: 'brand__name', text: 'PRINTLAB' })),
     el('h1', { class: 'title', text: 'แดชบอร์ดครูและนักวิจัย' }),
-    PASSWORD ? form : el('div', { class: 'notice notice--warn' }, icon('alert'), el('div', {}, el('strong', { text: 'ยังไม่ได้ตั้งรหัสผ่าน' }), el('p', { text: 'ตั้งตัวแปร VITE_TEACHER_PASSWORD ตอน build (เช่น secret ใน GitHub Actions) แล้ว deploy ใหม่ แดชบอร์ดจะปิดการเข้าถึงจนกว่าจะตั้ง' }))),
+    USING_FALLBACK ? fallbackWarning() : null,
+    form,
     el('p', { class: 'help', text: 'แดชบอร์ดแสดงเฉพาะรหัสนิรนาม (ANON-xxx) ไม่มีข้อมูลระบุตัวตนของนักเรียน' }),
   )));
   input.focus();
+}
+
+function fallbackWarning(): HTMLElement {
+  return el('div', { class: 'notice notice--warn', id: 'teacher-fallback-warning' }, icon('alert'), el('div', {},
+    el('strong', { text: 'ยังไม่ได้ตั้งรหัสผ่านจริง กำลังใช้รหัสสำรองจากโค้ด' }),
+    el('p', { text: 'ตั้ง secret TEACHER_PASSWORD ใน GitHub Actions (หรือ VITE_TEACHER_PASSWORD ตอน build) แล้ว deploy ใหม่โดยเร็ว รหัสสำรองอยู่ในไฟล์ src/teacher/main.ts' }),
+  ));
 }
 
 /* ---------- แดชบอร์ด ---------- */
@@ -75,6 +88,7 @@ async function dashboard(): Promise<void> {
   const peopleWrap = el('div', { class: 'table-wrap' });
   const main = el('main', { class: 'teacher-main' });
   append(root, header, main);
+  if (USING_FALLBACK) main.appendChild(fallbackWarning());
 
   /* แหล่งข้อมูล */
   const btnLocal = el('button', { class: 'btn btn--sm', type: 'button', id: 'src-local' }, icon('refresh'), 'โหลดจากเบราว์เซอร์นี้');

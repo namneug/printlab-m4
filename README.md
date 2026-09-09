@@ -92,7 +92,7 @@ npm run test:e2e     # e2e ทั้งหมด (ต้องเปิด previ
 | --- | --- | --- |
 | `VITE_EVENTS_ENDPOINT` | client | URL รับ event (Vercel: `https://<app>.vercel.app/api/events`) เว้นว่าง = เก็บในเครื่องและส่งออกเป็นไฟล์ |
 | `VITE_ROSTER_SIZE` | client | จำนวนรหัส ANON-001..0NN (ค่าเริ่มต้น 50) |
-| `VITE_TEACHER_PASSWORD` | client | รหัสผ่านแดชบอร์ดครู ไม่ตั้ง = แดชบอร์ดปิด |
+| `VITE_TEACHER_PASSWORD` | client | รหัสผ่านแดชบอร์ดครู ไม่ตั้ง = ใช้รหัสสำรองในโค้ด (`FALLBACK_PASSWORD` ใน `src/teacher/main.ts`) และขึ้นคำเตือนบนหน้าจอ |
 | `VITE_TEACHER_API` | client | URL ของ `api/teacher` สำหรับดึงข้อมูลจากเซิร์ฟเวอร์ |
 | `VITE_MENTOR_PROVIDER` | client | `rule` (เฟส 1 ค่าเริ่มต้น) หรือ `llm` (เฟส 2) |
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | server | ใช้ใน `api/events.ts` และ `api/teacher.ts` เท่านั้น |

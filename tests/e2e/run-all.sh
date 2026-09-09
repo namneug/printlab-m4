@@ -17,5 +17,6 @@ VITE_TEACHER_PASSWORD=test1234 npm run build >/dev/null
 run tests/e2e/m12-teacher.mjs
 
 npm run build >/dev/null
+run tests/e2e/m13-teacher-fallback.mjs
 if [ $fail -eq 0 ]; then echo "ALL E2E OK"; else echo "E2E FAILED"; fi
 exit $fail

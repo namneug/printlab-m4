@@ -4,17 +4,26 @@ import { navigate, type Screen } from '../router';
 import { TIMEPOINTS, getSession, isValidParticipant, startSession, endSession, ROSTER_SIZE, type Timepoint } from '../../game/session';
 import { track } from '../../telemetry/events';
 import { helpLink } from '../helpLink';
+import { createHero } from '../hero';
 
 export const startScreen: Screen = (root) => {
   const existing = getSession();
 
   const page = el('div', { class: 'screen screen--start' });
-  const card = el('section', { class: 'card card--start', 'aria-labelledby': 'start-title' });
+  const heroEl = el('div', { class: 'hero', 'aria-hidden': 'true' });
+  const hero = createHero(heroEl);
+  const card = el('section', { class: 'card card--start glass', 'aria-labelledby': 'start-title' });
 
   const brand = el('div', { class: 'brand brand--lg' }, icon('printer'), el('span', { class: 'brand__name', text: 'PRINTLAB' }));
-  const title = el('h1', { id: 'start-title', class: 'title', text: 'เกมสถานการณ์จำลองเครื่องพิมพ์ 3 มิติ' });
-  const lead = el('p', { class: 'lead' },
-    'วิเคราะห์ระบบ ทดลองภายใต้เงื่อนไข วินิจฉัยจากหลักฐาน และออกแบบชิ้นงานจริง ผ่านเครื่องพิมพ์ 3 มิติ Creality Ender 3 V3 KE ในห้องแล็บจำลอง');
+  const title = el('h1', { id: 'start-title', class: 'sr-only', text: 'PRINTLAB เกมสถานการณ์จำลองเครื่องพิมพ์ 3 มิติ' });
+  const lead = el('p', { class: 'lead', text: 'กรอกรหัสที่ครูแจก เลือกช่วงการเก็บข้อมูล แล้วเริ่มภารกิจ' });
+  // ชื่อเกมตัวใหญ่ซ้อนบนฉาก 3 มิติ
+  const heroTitle = el('div', { class: 'hero-title', 'aria-hidden': 'true' },
+    el('span', { class: 'hero-title__eyebrow', text: 'ห้องแล็บเครื่องพิมพ์ 3 มิติ · ม.4' }),
+    el('span', { class: 'hero-title__name', text: 'PRINTLAB' }),
+    el('span', { class: 'hero-title__th', text: 'เกมสถานการณ์จำลองเครื่องพิมพ์ 3 มิติ' }),
+    el('span', { class: 'hero-title__sub', text: 'วิเคราะห์ระบบ · ตัดสินใจภายใต้เงื่อนไข · ให้เหตุผลจากหลักฐาน' }),
+  );
 
   const ethics = el('div', { class: 'notice' },
     icon('shield'),
@@ -109,7 +118,10 @@ export const startScreen: Screen = (root) => {
     append(card, form);
   }
 
-  append(page, card, el('p', { class: 'foot', text: 'โรงเรียนสาธิตมหาวิทยาลัยราชภัฏสกลนคร · รายวิชาการออกแบบและเทคโนโลยี ม.4' }));
+  append(page, heroEl, el('div', { class: 'start-layout' }, heroTitle, el('div', { class: 'start-form-col' }, card, el('p', { class: 'foot', text: 'โรงเรียนสาธิตมหาวิทยาลัยราชภัฏสกลนคร · รายวิชาการออกแบบและเทคโนโลยี ม.4' }))));
   root.appendChild(page);
-  (page.querySelector('input, button') as HTMLElement | null)?.focus();
+  (page.querySelector('input, button') as HTMLElement | null)?.focus({ preventScroll: true });
+  return () => {
+    hero.dispose();
+  };
 };

@@ -20,5 +20,6 @@ npm run build >/dev/null
 run tests/e2e/m13-teacher-fallback.mjs
 run tests/e2e/m14-help.mjs
 run tests/e2e/m15-guide-tour.mjs
+run tests/e2e/m16-hero.mjs
 if [ $fail -eq 0 ]; then echo "ALL E2E OK"; else echo "E2E FAILED"; fi
 exit $fail

@@ -14,6 +14,7 @@ import { download, levelStats, mean, participantSummaries, stripStored, toCSV, t
 import type { GameEvent } from '../telemetry/schema';
 import { LEVELS } from '../levels';
 import { ROSTER_SIZE } from '../game/session';
+import { helpLink } from '../ui/helpLink';
 
 const ENV_PASSWORD = (import.meta.env['VITE_TEACHER_PASSWORD'] as string | undefined)?.trim() ?? '';
 /** รหัสสำรองเมื่อยังไม่ได้ตั้ง secret TEACHER_PASSWORD — เปลี่ยนได้ที่นี่ และควรตั้ง secret จริงโดยเร็ว */
@@ -78,7 +79,7 @@ async function dashboard(): Promise<void> {
   const header = el('header', { class: 'topbar' },
     el('div', { class: 'brand' }, icon('printer'), el('span', { class: 'brand__name', text: 'PRINTLAB' })),
     el('div', { class: 'topbar__title', text: 'แดชบอร์ดครูและนักวิจัย' }),
-    el('div', { class: 'topbar__right' }, el('span', { class: 'chip chip--muted' }, icon('shield'), el('span', { text: 'แสดงเฉพาะรหัสนิรนาม' })), el('a', { class: 'btn btn--ghost btn--sm', href: '../' }, icon('arrow-left'), 'หน้าเกม')),
+    el('div', { class: 'topbar__right' }, el('span', { class: 'chip chip--muted' }, icon('shield'), el('span', { text: 'แสดงเฉพาะรหัสนิรนาม' })), helpLink('คู่มือนักเรียน'), el('a', { class: 'btn btn--ghost btn--sm', href: '../' }, icon('arrow-left'), 'หน้าเกม')),
   );
   const srcInfo = el('span', { class: 'muted small' });
   const kpis = el('div', { class: 'kpis' });

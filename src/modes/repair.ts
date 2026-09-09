@@ -7,6 +7,7 @@ import { getSession } from '../game/session';
 import { track } from '../telemetry/events';
 import { randomCase, runDiagnosis, type DiagnosisOutcome } from './diagnosis';
 import type { Construct } from '../telemetry/schema';
+import { helpLink } from '../ui/helpLink';
 
 export const repairScreen: Screen = (root) => {
   const session = getSession();
@@ -26,7 +27,7 @@ export const repairScreen: Screen = (root) => {
   const bar = el('header', { class: 'levelbar' },
     el('a', { class: 'btn btn--ghost btn--sm', href: '#/map' }, icon('arrow-left'), 'แผนที่'),
     el('div', { class: 'levelbar__title' }, el('div', { class: 'levelbar__num', text: 'โหมดเปิดตลอด' }), el('h1', { class: 'levelbar__name', text: 'โมดูลซ่อม' }), status),
-    el('div', { class: 'levelbar__right' }, el('span', { class: 'chip chip--green' }, icon('wrench'), el('span', { text: 'ปิดเคสแล้ว ' }), counter), el('span', { class: 'chip' }, dock.dots), dock.hintBtn),
+    el('div', { class: 'levelbar__right' }, helpLink(), el('span', { class: 'chip chip--green' }, icon('wrench'), el('span', { text: 'ปิดเคสแล้ว ' }), counter), el('span', { class: 'chip' }, dock.dots), dock.hintBtn),
   );
   const body = el('main', { class: 'level-body' });
   const page = el('div', { class: 'screen screen--level' }, bar, body, dock.root);

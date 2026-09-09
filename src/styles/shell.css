@@ -215,3 +215,9 @@
   .levelbar__status { display: none; }
   .level-body { padding: var(--sp-4) var(--sp-3) 140px; }
 }
+
+/* จอแคบ: แถบบนห่อบรรทัด ไม่ล้นแนวนอน */
+@media (max-width: 640px) {
+  .topbar { flex-wrap: wrap; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3); }
+  .topbar__right { margin-left: 0; width: 100%; justify-content: flex-end; flex-wrap: wrap; }
+}

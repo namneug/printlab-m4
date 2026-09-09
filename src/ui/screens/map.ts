@@ -4,6 +4,7 @@ import { navigate, type Screen } from '../router';
 import { LEVELS } from '../../levels';
 import { getProgress, getSession, isLevelDone } from '../../game/session';
 import { track } from '../../telemetry/events';
+import { helpLink } from '../helpLink';
 
 let freeMode = false;
 
@@ -21,6 +22,7 @@ export const mapScreen: Screen = (root, _params, query) => {
     el('div', { class: 'topbar__right' },
       el('span', { class: 'chip' }, icon('user'), el('span', { class: 'mono', text: session?.participantCode ?? '' })),
       el('a', { class: 'btn btn--ghost btn--sm', href: '#/data' }, icon('chart'), 'ข้อมูลของฉัน'),
+      helpLink(),
       el('a', { class: 'btn btn--ghost btn--sm', href: '#/' }, icon('arrow-left'), 'หน้าแรก'),
     ),
   );

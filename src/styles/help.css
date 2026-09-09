@@ -1,0 +1,72 @@
+/* คู่มือนักเรียน — อ่านง่ายบนมือถือ พิมพ์ขาวดำได้ */
+.help-main { width: min(860px, 100%); margin: 0 auto; padding: var(--sp-5) var(--sp-4) var(--sp-6); display: flex; flex-direction: column; gap: var(--sp-6); font-size: 16px; line-height: 1.7; }
+.help-hero { display: flex; flex-direction: column; gap: var(--sp-2); }
+.help-hero h1 { font-size: 28px; }
+.help-hero p { color: var(--tx-2); }
+.toc { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.toc a { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 14px; color: var(--tx-2); background: var(--panel); }
+.toc a:hover { border-color: var(--cyan); color: var(--tx); }
+.hsec { display: flex; flex-direction: column; gap: var(--sp-3); scroll-margin-top: 80px; }
+.hsec__head { display: flex; align-items: center; gap: var(--sp-3); }
+.hsec__num { display: grid; place-items: center; flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; background: var(--amber); color: #1a1206; font-family: var(--font-display); font-weight: 700; font-size: 16px; }
+.hsec h2 { font-size: 22px; }
+.steps { display: flex; flex-direction: column; gap: var(--sp-2); counter-reset: step; padding: 0; margin: 0; list-style: none; }
+.steps li { display: flex; gap: var(--sp-3); padding: var(--sp-3); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.steps li::before { counter-increment: step; content: counter(step); flex: 0 0 auto; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--panel-3); font-family: var(--font-display); font-weight: 700; color: var(--cyan); }
+.steps b { font-family: var(--font-display); }
+.screen-parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--sp-3); }
+.screen-part { padding: var(--sp-3); background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--cyan); border-radius: var(--radius); }
+.screen-part h3 { font-size: 16px; margin-bottom: 4px; }
+.screen-part p { font-size: 14px; color: var(--tx-2); }
+.screen-part--top { border-top-color: var(--amber); }
+.screen-part--mentor { border-top-color: var(--cyan); }
+.screen-part--work { border-top-color: var(--violet); }
+.lvl-cards { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
+.lvl { padding: var(--sp-4); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: var(--sp-2); }
+.lvl__head { display: flex; align-items: baseline; gap: var(--sp-3); flex-wrap: wrap; }
+.lvl__num { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--amber); }
+.lvl__title { font-size: 19px; }
+.lvl__meta { font-size: 13px; color: var(--tx-mut); }
+.lvl dl { display: grid; grid-template-columns: 90px 1fr; gap: 6px var(--sp-3); margin: 0; }
+.lvl dt { font-family: var(--font-display); font-weight: 600; color: var(--tx-2); }
+.lvl dd { margin: 0; }
+.lvl dd ul { margin: 0; padding-left: 20px; }
+.lvl dt--pass { color: var(--green); }
+.modes-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--sp-3); }
+.modes-2 .panel__body ul { margin: 0; padding-left: 20px; }
+.danger-box { padding: var(--sp-4); border: 3px solid var(--red); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--red) 14%, var(--panel)); display: flex; gap: var(--sp-3); }
+.danger-box .icon--lg { color: var(--red); flex: 0 0 auto; }
+.danger-box h2 { color: var(--red); font-size: 22px; margin-bottom: 6px; }
+.danger-box ol { margin: 6px 0 0; padding-left: 22px; }
+.danger-box b { font-family: var(--font-display); }
+.fix-table td:first-child { font-family: var(--font-display); font-weight: 600; white-space: normal; min-width: 140px; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--sp-3); padding: 0; margin: 0; list-style: none; counter-reset: rule; }
+.rules li { padding: var(--sp-3); background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--green); border-radius: var(--radius); }
+.rules li::before { counter-increment: rule; content: 'กติกาข้อ ' counter(rule); display: block; font-family: var(--font-display); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--green); margin-bottom: 4px; }
+.help-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+kbd.key { font-family: var(--font-display); font-size: 13px; color: var(--tx); padding: 1px 8px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; background: var(--panel-3); white-space: nowrap; }
+.help-foot { font-size: 13px; color: var(--tx-dim); text-align: center; }
+
+@media (max-width: 600px) {
+  .help-main { padding: var(--sp-4) var(--sp-3) var(--sp-6); font-size: 15px; }
+  .lvl dl { grid-template-columns: 1fr; }
+  .lvl dt { margin-top: 4px; }
+}
+
+/* ---------- พิมพ์ขาวดำ ---------- */
+@media print {
+  :root { --bg: #fff; --bg-deep: #fff; --panel: #fff; --panel-2: #f4f4f4; --panel-3: #e8e8e8; --line: #888; --line-2: #aaa; --tx: #000; --tx-2: #111; --tx-mut: #333; --tx-dim: #555; --amber: #000; --cyan: #000; --violet: #000; --green: #000; --red: #000; }
+  body { background: #fff; color: #000; font-size: 12pt; }
+  .topbar, .toc, .help-actions, .no-print { display: none !important; }
+  .help-main { width: 100%; padding: 0; gap: 18pt; }
+  .hsec { break-inside: avoid; page-break-inside: avoid; }
+  .lvl, .steps li, .screen-part, .rules li { break-inside: avoid; page-break-inside: avoid; border-color: #888; }
+  .hsec__num, .steps li::before { background: #000 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .danger-box { border: 3pt solid #000; background: #fff; }
+  .danger-box h2 { color: #000; }
+  a { color: #000; text-decoration: none; }
+  a[href^='http']::after { content: ' (' attr(href) ')'; font-size: 9pt; color: #333; }
+  .lvl__num { color: #000; }
+  .icon { stroke: #000; }
+  .table th, .table td { border-bottom: 1px solid #888; }
+}

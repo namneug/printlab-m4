@@ -35,6 +35,7 @@
 printlab-m4/
 ├── index.html               หน้าเกม (hash router: #/ #/map #/level/l1 … #/explore #/repair #/data)
 ├── teacher/index.html       แดชบอร์ดครู → /printlab-m4/teacher/
+├── help/index.html          คู่มือนักเรียน → /printlab-m4/help/ (พิมพ์ขาวดำได้)
 ├── api/                     Vercel serverless functions
 │   ├── events.ts            รับ event → Supabase (service role)
 │   ├── teacher.ts           ข้อมูลแดชบอร์ด (x-teacher-token)
@@ -48,6 +49,7 @@ printlab-m4/
 │   ├── mentor/              index.ts (MentorProvider) rule.ts (RuleMentor) llm.ts (เฟส 2)
 │   ├── telemetry/           schema.ts events.ts queue.ts (IndexedDB) export.ts (CSV/JSON/สรุป)
 │   ├── teacher/main.ts      แดชบอร์ดครู
+│   ├── help/main.ts         คู่มือนักเรียน (ดึงค่าจริงจากข้อมูลเกม)
 │   ├── ui/                  router, dom, icons, diagram (SVG ลากเส้น), mentorDock, screens/
 │   ├── data/                parts.json levels.json hints.json faults.json materials.json mission.json impact.json
 │   └── styles/              tokens.css base.css shell.css levels.css teacher.css

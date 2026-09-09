@@ -7,6 +7,7 @@ import { buildFlowLayers } from '../game/flows';
 import { FLOWS, PARTS, SUBSYSTEMS, partById, subsystemById, type FlowLayerId, type PartSpec } from '../game/printer';
 import { getSession, saveData, getProgress } from '../game/session';
 import { track } from '../telemetry/events';
+import { helpLink } from '../ui/helpLink';
 
 const LAYER_ICON: Record<FlowLayerId, IconName> = { control: 'cpu', heat: 'thermo', motion: 'move' };
 
@@ -28,7 +29,7 @@ export const exploreScreen: Screen = (root) => {
   const bar = el('header', { class: 'levelbar' },
     el('a', { class: 'btn btn--ghost btn--sm', href: '#/map' }, icon('arrow-left'), 'แผนที่'),
     el('div', { class: 'levelbar__title' }, el('div', { class: 'levelbar__num', text: 'โหมดเปิดตลอด' }), el('h1', { class: 'levelbar__name', text: 'สำรวจสถาปัตยกรรม' }), el('p', { class: 'levelbar__status', text: 'แตะชิ้นส่วนในโมเดลหรือรายการเพื่อดูชื่อ หน้าที่ และการเชื่อมต่อ' })),
-    el('div', { class: 'levelbar__right' }, el('span', { class: 'chip' }, icon('eye'), el('span', { text: 'สำรวจแล้ว ' }), exploredChip)),
+    el('div', { class: 'levelbar__right' }, helpLink(), el('span', { class: 'chip' }, icon('eye'), el('span', { text: 'สำรวจแล้ว ' }), exploredChip)),
   );
   const body = el('main', { class: 'level-body' });
   const page = el('div', { class: 'screen screen--level screen--wide' }, bar, body);

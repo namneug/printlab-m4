@@ -7,6 +7,7 @@ import { download, filterEvents, levelStats, stripStored, toCSV, toJSON, toSumma
 import { CONSTRUCT_LABELS, type Construct } from '../../telemetry/schema';
 import { LEVELS } from '../../levels';
 import { track } from '../../telemetry/events';
+import { helpLink } from '../helpLink';
 
 /** หน้า "ข้อมูลของฉัน" — ดู event ที่บันทึกในเครื่องนี้ และส่งออก CSV/JSON */
 export const dataScreen: Screen = (root) => {
@@ -15,7 +16,7 @@ export const dataScreen: Screen = (root) => {
   const header = el('header', { class: 'topbar' },
     el('div', { class: 'brand' }, icon('printer'), el('span', { class: 'brand__name', text: 'PRINTLAB' })),
     el('div', { class: 'topbar__title', text: 'ข้อมูลของฉัน' }),
-    el('div', { class: 'topbar__right' }, el('a', { class: 'btn btn--ghost btn--sm', href: '#/map' }, icon('arrow-left'), 'แผนที่')),
+    el('div', { class: 'topbar__right' }, helpLink(), el('a', { class: 'btn btn--ghost btn--sm', href: '#/map' }, icon('arrow-left'), 'แผนที่')),
   );
 
   const stats = el('div', { class: 'row' });

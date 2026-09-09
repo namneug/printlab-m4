@@ -8,6 +8,7 @@ import { track } from '../../telemetry/events';
 import { createMentor } from '../../mentor';
 import { createMentorDock, MODE_LABEL } from '../mentorDock';
 import type { Construct } from '../../telemetry/schema';
+import { helpLink } from '../helpLink';
 
 export const levelScreen: Screen = (root, params) => {
   const found = levelMeta(params['id'] ?? '');
@@ -41,6 +42,7 @@ export const levelScreen: Screen = (root, params) => {
       status,
     ),
     el('div', { class: 'levelbar__right' },
+      helpLink(),
       el('span', { class: 'chip chip--muted' }, icon('clock'), timer),
       el('span', { class: 'chip' }, dock.dots),
       dock.hintBtn,

@@ -3,6 +3,7 @@ import { icon } from '../icons';
 import { navigate, type Screen } from '../router';
 import { TIMEPOINTS, getSession, isValidParticipant, startSession, endSession, ROSTER_SIZE, type Timepoint } from '../../game/session';
 import { track } from '../../telemetry/events';
+import { helpLink } from '../helpLink';
 
 export const startScreen: Screen = (root) => {
   const existing = getSession();
@@ -23,7 +24,9 @@ export const startScreen: Screen = (root) => {
     ),
   );
 
-  append(card, brand, title, lead, ethics);
+  const helpBtn = helpLink('อ่านคู่มือก่อนเริ่ม', 'btn btn--cyan');
+  helpBtn.id = 'start-help';
+  append(card, brand, title, lead, el('div', { class: 'row' }, helpBtn), ethics);
 
   if (existing) {
     const resume = el('div', { class: 'resume' },

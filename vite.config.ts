@@ -19,6 +19,7 @@ export default defineConfig({
       input: {
         main: new URL('./index.html', import.meta.url).pathname,
         teacher: new URL('./teacher/index.html', import.meta.url).pathname,
+        help: new URL('./help/index.html', import.meta.url).pathname,
       },
       output: {
         codeSplitting: {
